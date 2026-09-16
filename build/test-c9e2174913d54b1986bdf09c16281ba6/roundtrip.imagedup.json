@@ -1,0 +1,72 @@
+﻿{
+  "format": "ImageDupSession",
+  "version": 1,
+  "criteria": {
+    "paths": [
+      "H:\\Documenti\\Embarcadero\\Studio\\Projects\\ImageDup\\build\\test-c9e2174913d54b1986bdf09c16281ba6",
+      "H:\\Documenti\\Embarcadero\\Studio\\Projects\\ImageDup\\build\\test-c9e2174913d54b1986bdf09c16281ba6\\nested",
+      "H:\\Documenti\\Embarcadero\\Studio\\Projects\\ImageDup\\build\\test-c9e2174913d54b1986bdf09c16281ba6"
+    ],
+    "recursive": false,
+    "distance": 7,
+    "pixelError": 0.07
+  },
+  "selectedFiles": [
+    "H:\\Documenti\\Embarcadero\\Studio\\Projects\\ImageDup\\build\\test-c9e2174913d54b1986bdf09c16281ba6\\nested\\resized.png"
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "members": [
+        {
+          "fileName": "H:\\Documenti\\Embarcadero\\Studio\\Projects\\ImageDup\\build\\test-c9e2174913d54b1986bdf09c16281ba6\\compressed.jpg",
+          "width": 256,
+          "height": 256,
+          "bytes": 2421,
+          "modified": "2026-09-14T07:22:32.829+02:00",
+          "distance": 0,
+          "rgbError": 0.0,
+          "structural": 1.0,
+          "worstStructural": 1.0,
+          "worstRGB": 0.0
+        },
+        {
+          "fileName": "H:\\Documenti\\Embarcadero\\Studio\\Projects\\ImageDup\\build\\test-c9e2174913d54b1986bdf09c16281ba6\\copy.png",
+          "width": 256,
+          "height": 256,
+          "bytes": 1952,
+          "modified": "2026-09-14T07:22:32.809+02:00",
+          "distance": 0,
+          "rgbError": 0.0110918146611189,
+          "structural": 0.998956110431684,
+          "worstStructural": 0.992184828616527,
+          "worstRGB": 0.0353598697621152
+        },
+        {
+          "fileName": "H:\\Documenti\\Embarcadero\\Studio\\Projects\\ImageDup\\build\\test-c9e2174913d54b1986bdf09c16281ba6\\original.png",
+          "width": 256,
+          "height": 256,
+          "bytes": 1952,
+          "modified": "2026-09-14T07:22:32.809+02:00",
+          "distance": 0,
+          "rgbError": 0.0110918146611189,
+          "structural": 0.998956110431684,
+          "worstStructural": 0.992184828616527,
+          "worstRGB": 0.0353598697621152
+        },
+        {
+          "fileName": "H:\\Documenti\\Embarcadero\\Studio\\Projects\\ImageDup\\build\\test-c9e2174913d54b1986bdf09c16281ba6\\nested\\resized.png",
+          "width": 512,
+          "height": 512,
+          "bytes": 4520,
+          "modified": "2026-09-14T07:22:32.813+02:00",
+          "distance": 0,
+          "rgbError": 0.0129067352928678,
+          "structural": 0.99836626480216,
+          "worstStructural": 0.98072713042164,
+          "worstRGB": 0.0415260989130858
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+Embarcadero Delphi for Win64 compiler version 37.0
+Copyright (c) 1983,2026 Embarcadero Technologies, Inc.
+ImageDup.Scan.pas(184) Warning: W1002 Symbol 'FindData' is specific to a platform
+1084 lines, 0.25 seconds, 3812256 bytes code, 395948 bytes data.
+Embarcadero Delphi for Win64 compiler version 37.0
+Copyright (c) 1983,2026 Embarcadero Technologies, Inc.
+ImageDup.CLI.dpr(132) Warning: W1002 Symbol 'faSymLink' is specific to a platform
+ImageDup.CLI.dpr(133) Warning: W1002 Symbol 'FindData' is specific to a platform
+474 lines, 0.09 seconds, 1892596 bytes code, 256512 bytes data.
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\copy.png",0,0.0110918146611189
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\original.png",0,0.0110918146611189
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\copy.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\original.png",0,0
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\nested\resized.png",0,0.0129067352928678
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\copy.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\nested\resized.png",0,0.00692284462816686
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\original.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\nested\resized.png",0,0.00692284462816686
+Immagini: 7; coppie candidate: 6; errori: 0
+Errore: System Error.  Code: 80.
+File esistente
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\copy.png",0,0.0110918146611189
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\original.png",0,0.0110918146611189
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\copy.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\original.png",0,0
+Immagini: 6; coppie candidate: 3; errori: 0
+Errore: Distanza richiesta: intero tra 0 e 63
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\copy.png",0,0.0110918146611189
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\original.png",0,0.0110918146611189
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\copy.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\original.png",0,0
+Immagine saltata: H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\broken.jpg: JPEG error #53
+Immagini: 6; coppie candidate: 3; errori: 1
+PASS: ricampionamento, JPEG, copie, falsi positivi, ricorsione, CSV, argomenti e file corrotti. Artefatti: H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549
+Embarcadero Delphi for Win64 compiler version 37.0
+Copyright (c) 1983,2026 Embarcadero Technologies, Inc.
+ImageDup.Scan.pas(184) Warning: W1002 Symbol 'FindData' is specific to a platform
+1225 lines, 0.20 seconds, 3828224 bytes code, 397000 bytes data.
+Embarcadero Delphi for Win64 compiler version 37.0
+Copyright (c) 1983,2026 Embarcadero Technologies, Inc.
+458 lines, 0.09 seconds, 1901908 bytes code, 256384 bytes data.
+PASS: hash/RGB collisions, high-frequency differences, local differences, exact copies.
+PASS: groups, singleton hiding, no transitive chaining, multiple groups.
+Initial groups: Gruppo 1 - 4 immagini - compressed.jpg
+ Status: Completata con errori | Analizzate: 7 | Gruppi: 1 | File raggruppati: 4 | Errori: 1
+H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\compressed.jpg
+H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\copy.png
+H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\original.png
+H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-ab5b2b02c2034aafadcefb028c9d4549\nested\resized.png
+PASS: DFM, worker, overlapping roots, metadata, row selection, previews, resize, missing file, empty scan, cancel, close.

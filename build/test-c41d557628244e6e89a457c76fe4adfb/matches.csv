@@ -1,0 +1,7 @@
+﻿file_a,file_b,hash_distance,pixel_rmse
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\copy.png",0,0.0084615047141407
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\original.png",0,0.0084615047141407
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\copy.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\original.png",0,0
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\nested\resized.png",0,0.00961678005726149
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\copy.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\nested\resized.png",0,0.0047039245655179
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\original.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-c41d557628244e6e89a457c76fe4adfb\nested\resized.png",0,0.0047039245655179

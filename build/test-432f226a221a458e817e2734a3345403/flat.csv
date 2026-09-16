@@ -1,0 +1,4 @@
+﻿file_a,file_b,hash_distance,pixel_rmse
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-432f226a221a458e817e2734a3345403\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-432f226a221a458e817e2734a3345403\copy.png",0,0.0110988644783119
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-432f226a221a458e817e2734a3345403\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-432f226a221a458e817e2734a3345403\original.png",0,0.0110988644783119
+"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-432f226a221a458e817e2734a3345403\copy.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-432f226a221a458e817e2734a3345403\original.png",0,0
