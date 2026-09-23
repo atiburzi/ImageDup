@@ -1,7 +1,0 @@
-﻿file_a,file_b,hash_distance,pixel_rmse
-"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\copy.png",0,0.0110918146611189
-"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\original.png",0,0.0110918146611189
-"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\copy.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\original.png",0,0
-"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\compressed.jpg","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\nested\resized.png",0,0.0129067352928678
-"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\copy.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\nested\resized.png",0,0.00692284462816686
-"H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\original.png","H:\Documenti\Embarcadero\Studio\Projects\ImageDup\build\test-24ca2773075143acbde1ee1eb5accace\nested\resized.png",0,0.00692284462816686

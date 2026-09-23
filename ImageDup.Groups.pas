@@ -37,11 +37,12 @@ type
     // Only join a group when every member has a verified match. Groups are
     // disjoint, first-fit and order-dependent; similarity is not transitive.
     function Add(const Info: TImageInfo;
-      Matches: TDictionary<Integer, TComparison>): Integer;
+      Matches: TDictionary<Integer, TComparison>; IncludeSingletons: Boolean = False): Integer;
     function Snapshot(Id: Integer): TImageGroup;
   end;
 
 procedure CalculateGroupQuality(var Group: TImageGroup);
+function ReferenceMemberIndex(const Group: TImageGroup): Integer;
 
 implementation
 
@@ -68,6 +69,19 @@ begin
   else Result := 1;
 end;
 
+function ColorModeFactor(Value: TImageColorMode): Double;
+begin
+  case Value of
+    icmColor: Result := 1.0;
+    icmGrayscale: Result := 0.5;
+    icmMonochrome: Result := 0.0;
+  else
+    // Old sessions do not contain this metric. Treat them neutrally until
+    // their files are scanned again.
+    Result := 0.5;
+  end;
+end;
+
 function ChromaFactor(Value: TChromaSubsampling): Double;
 begin
   case Value of
@@ -83,12 +97,21 @@ end;
 
 procedure CalculateGroupQuality(var Group: TImageGroup);
 var
-    I, J: Integer;
+  I, J: Integer;
   MaxPixels: Int64;
-  MaxSharpness, ResolutionFactor, SharpnessFactor, ProfileFactor: Double;
+  MaxSharpness, ResolutionFactor, SharpnessFactor, ProfileFactor,
+    ExistingCriteriaScore: Double;
   Q: TImageQualityMetrics;
   SwapMember: TGroupMember;
+  ReferenceFileName: string;
 begin
+  ReferenceFileName := '';
+  for I := 0 to High(Group.Members) do
+    if Group.Members[I].IsReference then
+    begin
+      ReferenceFileName := Group.Members[I].Info.FileName;
+      Break;
+    end;
   MaxPixels := 0;
   MaxSharpness := 0;
   for I := 0 to High(Group.Members) do begin
@@ -105,7 +128,7 @@ begin
     if MaxSharpness > 1E-12 then SharpnessFactor := Q.Sharpness / MaxSharpness
     else SharpnessFactor := 0.5;
     if Q.HasColorProfile then ProfileFactor := 1 else ProfileFactor := 0.8;
-    Group.Members[I].QualityScore := EnsureRange(
+    ExistingCriteriaScore :=
       ResolutionWeight * ResolutionFactor +
       SharpnessWeight * SharpnessFactor +
       ArtifactWeight * (1 - Q.BlockArtifacts) +
@@ -115,21 +138,43 @@ begin
       ClippingWeight * (1 - Q.Clipping) +
       BandingWeight * (1 - Q.Banding) +
       UpscaleWeight * (1 - Q.UpscaleRisk) +
-      ChromaWeight * ChromaFactor(Q.ChromaSubsampling), 0.0, 100.0);
+      ChromaWeight * ChromaFactor(Q.ChromaSubsampling);
+    // The previous criteria retain 85% of the final score. Color mode owns
+    // the remaining 15%: color 15 points, grayscale 7.5, monochrome 0.
+    Group.Members[I].QualityScore := EnsureRange(
+      ExistingCriteriaScore * 0.85 +
+      15.0 * ColorModeFactor(Q.ColorMode), 0.0, 100.0);
   end;
-    // Stable descending order: the first member is the reference.
-    for I := 1 to High(Group.Members) do begin
-      SwapMember := Group.Members[I];
-      J := I - 1;
-      while (J >= 0) and
-        (Group.Members[J].QualityScore < SwapMember.QualityScore) do begin
-        Group.Members[J + 1] := Group.Members[J];
-        Dec(J);
-      end;
-      Group.Members[J + 1] := SwapMember;
+  // Keep the visual order by descending quality without losing an explicitly
+  // selected reference when scores are recalculated.
+  for I := 1 to High(Group.Members) do begin
+    SwapMember := Group.Members[I];
+    J := I - 1;
+    while (J >= 0) and
+      (Group.Members[J].QualityScore < SwapMember.QualityScore) do begin
+      Group.Members[J + 1] := Group.Members[J];
+      Dec(J);
     end;
-    for I := 0 to High(Group.Members) do
-      Group.Members[I].IsReference := I = 0;
+    Group.Members[J + 1] := SwapMember;
+  end;
+  for I := 0 to High(Group.Members) do
+    Group.Members[I].IsReference :=
+      ((ReferenceFileName <> '') and
+       SameText(Group.Members[I].Info.FileName, ReferenceFileName)) or
+      ((ReferenceFileName = '') and (I = 0));
+end;
+
+function ReferenceMemberIndex(const Group: TImageGroup): Integer;
+var
+  I: Integer;
+begin
+  for I := 0 to High(Group.Members) do
+    if Group.Members[I].IsReference then
+      Exit(I);
+  if Length(Group.Members) > 0 then
+    Result := 0
+  else
+    Result := -1;
 end;
 
 constructor TGroupBuilder.Create;
@@ -145,7 +190,7 @@ begin
 end;
 
 function TGroupBuilder.Add(const Info: TImageInfo;
-  Matches: TDictionary<Integer, TComparison>): Integer;
+  Matches: TDictionary<Integer, TComparison>; IncludeSingletons: Boolean): Integer;
 var
   I, J: Integer;
   Fits: Boolean;
@@ -191,7 +236,10 @@ begin
   Member.Metrics.Structural := 1;
   Member.Metrics.WorstStructural := 1;
   Group.Add(Member);
-  Result := -1; // Singletons are retained internally, but not shown as groups.
+  if IncludeSingletons then
+    Result := FGroups.Count - 1
+  else
+    Result := -1; // Retain internally for future matches.
 end;
 
 function TGroupBuilder.Snapshot(Id: Integer): TImageGroup;
@@ -202,3 +250,5 @@ begin
 end;
 
 end.
+
+

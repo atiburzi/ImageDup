@@ -11,10 +11,14 @@ const
   MinLocalSimilarity = 0.80;
   MaxLocalRGBError = 0.18;
   DefaultMaxRGBError = 0.08;
+  MinComparisonQuality = 0;
+  MaxComparisonQuality = 10;
+  MaxHashDistance = 63;
 
 type
   TChromaSubsampling = (csUnknown, csNotApplicable, csGray, cs420, cs422,
     cs444, csOther);
+  TImageColorMode = (icmUnknown, icmMonochrome, icmGrayscale, icmColor);
 
   TImageQualityMetrics = record
     // Pixel-derived values are normalized to 0..1. Higher Sharpness is better;
@@ -28,6 +32,7 @@ type
     BitDepth: Integer;
     HasColorProfile: Boolean;
     ChromaSubsampling: TChromaSubsampling;
+    ColorMode: TImageColorMode;
   end;
 
   TImageSignature = record
@@ -47,13 +52,18 @@ function CompareSignatures(const A, B: TImageSignature; MaxDistance: Integer;
   MaxRGBError: Double; out Metrics: TComparison): Boolean;
 procedure StructuralMetrics(const A, B: TImageSignature; out Metrics: TComparison);
 function SignatureFromGraphic(Graphic: TGraphic): TImageSignature;
+function IsSupportedImageFile(const FileName: string): Boolean;
+procedure LoadImagePreview(const FileName: string; Picture: TPicture);
 function LoadSignature(const FileName: string): TImageSignature; overload;
 function LoadSignature(const FileName: string; out Width, Height: Integer): TImageSignature; overload;
 function LoadSignature(const FileName: string; out Width, Height: Integer;
   out DpiX, DpiY: Double): TImageSignature; overload;
 function HashDistance(A, B: UInt64): Integer;
+function ComparisonQualityToDistance(Quality: Integer): Integer;
+function DistanceToComparisonQuality(Distance: Integer): Integer;
 function PixelError(const A, B: TImageSignature): Double;
 function ChromaSubsamplingText(Value: TChromaSubsampling): string;
+function ImageColorModeText(Value: TImageColorMode): string;
 
 implementation
 
@@ -67,21 +77,107 @@ type
 const
   PF_POPCNT_INSTRUCTION_AVAILABLE = 23;
 
+resourcestring
+  rsChromaGray='grayscale';
+  rsChromaOther='other';
+  rsColorModeColor='color';
+  rsColorModeGrayscale='grayscale';
+  rsColorModeMonochrome='monochrome';
+  rsUnknown='unknown';
+  rsTruncatedJpeg='Truncated JPEG file';
+  rsEmptyImage='Empty image';
+  rsInvalidImageDimensions='Invalid image dimensions';
+  rsImageTooLarge='Image is too large';
+  rsImageDecoderUnavailable = 'No Windows WIC decoder is available for %s. Install or enable a compatible image extension (WebP or HEIF/HEVC for those formats).';
+
 var
   GCosines: array[0..7, 0..31] of Double;
   GPopCntAvailable: Boolean;
 
+function IsSupportedImageFile(const FileName: string): Boolean;
+var
+  Ext: string;
+begin
+  Ext := LowerCase(ExtractFileExt(FileName));
+  Result := (Ext = '.jpg') or (Ext = '.jpeg') or (Ext = '.png') or
+    (Ext = '.bmp') or (Ext = '.gif') or (Ext = '.tif') or
+    (Ext = '.tiff') or (Ext = '.webp') or (Ext = '.heic') or
+    (Ext = '.heif');
+end;
+
+function ComparisonQualityToDistance(Quality: Integer): Integer;
+begin
+  Quality := EnsureRange(Quality, MinComparisonQuality,
+    MaxComparisonQuality);
+  Result := ((MaxComparisonQuality - Quality) * MaxHashDistance +
+    MaxComparisonQuality div 2) div MaxComparisonQuality;
+end;
+
+function DistanceToComparisonQuality(Distance: Integer): Integer;
+begin
+  Distance := EnsureRange(Distance, 0, MaxHashDistance);
+  Result := ((MaxHashDistance - Distance) * MaxComparisonQuality +
+    MaxHashDistance div 2) div MaxHashDistance;
+end;
 function ChromaSubsamplingText(Value: TChromaSubsampling): string;
 begin
   case Value of
     csNotApplicable: Result := '-';
-    csGray: Result := 'grigio';
+    csGray: Result := rsChromaGray;
     cs420: Result := '4:2:0';
     cs422: Result := '4:2:2';
     cs444: Result := '4:4:4';
-    csOther: Result := 'altro';
+    csOther: Result := rsChromaOther;
   else
-    Result := 'sconosciuto';
+    Result := rsUnknown;
+  end;
+end;
+
+function ImageColorModeText(Value: TImageColorMode): string;
+begin
+  case Value of
+    icmMonochrome: Result := rsColorModeMonochrome;
+    icmGrayscale: Result := rsColorModeGrayscale;
+    icmColor: Result := rsColorModeColor;
+  else
+    Result := rsUnknown;
+  end;
+end;
+
+procedure DetectSignatureColorMode(var Signature: TImageSignature);
+const
+  ColorTolerance = 8;
+  MinimumColorRatio = 0.01;
+var
+  Histogram: array[0..255] of Boolean;
+  I, Red, Green, Blue, Luma, Occupied, ColorCount, PixelCount: Integer;
+begin
+  FillChar(Histogram, SizeOf(Histogram), 0);
+  ColorCount := 0;
+  PixelCount := DetailSize * DetailSize;
+  for I := 0 to PixelCount - 1 do
+  begin
+    Red := Signature.DetailRGB[I * 3];
+    Green := Signature.DetailRGB[I * 3 + 1];
+    Blue := Signature.DetailRGB[I * 3 + 2];
+    if Max(Max(Red, Green), Blue) - Min(Min(Red, Green), Blue) >
+      ColorTolerance then
+      Inc(ColorCount);
+    Luma := Signature.DetailGray[I];
+    Histogram[Luma] := True;
+  end;
+  if ColorCount / PixelCount >= MinimumColorRatio then
+    Signature.Quality.ColorMode := icmColor
+  else
+  begin
+    Occupied := 0;
+    for I := 0 to High(Histogram) do
+      if Histogram[I] then
+        Inc(Occupied);
+    if Occupied <= 2 then
+      Signature.Quality.ColorMode := icmMonochrome
+    else
+      Signature.Quality.ColorMode := icmGrayscale;
   end;
 end;
 
@@ -98,9 +194,11 @@ procedure AnalyzePixels(const Pixels: TBytes; Width, Height, Stride: Integer;
   var Quality: TImageQualityMetrics);
 const MaxSamples = 500000;
 var
-  X, Y, Step, C, L, R, U, D, Lap, Grad, Delta, I: Integer;
+  X, Y, Step, C, L, R, U, D, Lap, Grad, Delta, I, Offset,
+    Alpha, PixelRed, PixelGreen, PixelBlue: Integer;
   Count, FlatCount, ClipCount, RepeatCount, TransitionCount,
-    SmallTransitionCount, BoundaryCount, InteriorCount, Occupied: Int64;
+    SmallTransitionCount, BoundaryCount, InteriorCount, Occupied,
+    ColorCount: Int64;
   LapSquares, NoiseTotal, BoundaryTotal, InteriorTotal: Double;
   Histogram: array[0..255] of Integer;
   RepeatRatio, BoundaryAverage, InteriorAverage: Double;
@@ -111,9 +209,11 @@ begin
   Quality.Clipping := 0;
   Quality.Banding := 0;
   Quality.UpscaleRisk := 0;
+  Quality.ColorMode := icmUnknown;
   if (Width < 3) or (Height < 3) then Exit;
   Step := Max(1, Ceil(Sqrt((Int64(Width) * Height) / MaxSamples)));
   Count := 0; FlatCount := 0; ClipCount := 0; RepeatCount := 0;
+  ColorCount := 0;
   TransitionCount := 0; SmallTransitionCount := 0;
   BoundaryCount := 0; InteriorCount := 0;
   LapSquares := 0; NoiseTotal := 0; BoundaryTotal := 0; InteriorTotal := 0;
@@ -124,7 +224,15 @@ begin
     X := Step;
     while X < Width - Step do
     begin
-      C := PixelLuma(Pixels, NativeInt(Y) * Stride + NativeInt(X) * 4);
+      Offset := NativeInt(Y) * Stride + NativeInt(X) * 4;
+      C := PixelLuma(Pixels, Offset);
+      Alpha := Pixels[Offset + 3];
+      PixelBlue := (Pixels[Offset] * Alpha + 255 * (255 - Alpha) + 127) div 255;
+      PixelGreen := (Pixels[Offset + 1] * Alpha + 255 * (255 - Alpha) + 127) div 255;
+      PixelRed := (Pixels[Offset + 2] * Alpha + 255 * (255 - Alpha) + 127) div 255;
+      if Max(Max(PixelRed, PixelGreen), PixelBlue) -
+        Min(Min(PixelRed, PixelGreen), PixelBlue) > 8 then
+        Inc(ColorCount);
       L := PixelLuma(Pixels, NativeInt(Y) * Stride + NativeInt(X - Step) * 4);
       R := PixelLuma(Pixels, NativeInt(Y) * Stride + NativeInt(X + Step) * 4);
       U := PixelLuma(Pixels, NativeInt(Y - Step) * Stride + NativeInt(X) * 4);
@@ -160,19 +268,26 @@ begin
       (BoundaryAverage - InteriorAverage) / 24, 0.0, 1.0);
   end;
   Quality.Clipping := ClipCount / Count;
-  if TransitionCount > 0 then begin
-    Occupied := 0;
-    for I := 0 to 255 do if Histogram[I] > 0 then Inc(Occupied);
+  Occupied := 0;
+  for I := 0 to 255 do
+    if Histogram[I] > 0 then
+      Inc(Occupied);
+  if TransitionCount > 0 then
     Quality.Banding := EnsureRange((SmallTransitionCount / TransitionCount) *
       (1 - Min(1.0, Occupied / 160)), 0.0, 1.0);
-  end;
+  if ColorCount / Count >= 0.01 then
+    Quality.ColorMode := icmColor
+  else if Occupied <= 2 then
+    Quality.ColorMode := icmMonochrome
+  else
+    Quality.ColorMode := icmGrayscale;
   RepeatRatio := RepeatCount / Count;
   Quality.UpscaleRisk := EnsureRange((RepeatRatio - 0.10) / 0.60, 0.0, 1.0);
 end;
 
 function ReadByte(Stream: TStream): Byte;
 begin
-  if Stream.Read(Result, 1) <> 1 then raise EReadError.Create('JPEG troncato');
+  if Stream.Read(Result, 1) <> 1 then raise EReadError.Create(rsTruncatedJpeg);
 end;
 
 function ReadBigEndianWord(Stream: TStream): Integer;
@@ -259,6 +374,7 @@ begin
       Gray[Y, X] := 0.299 * Signature.RGB[K] + 0.587 * Signature.RGB[K + 1] +
         0.114 * Signature.RGB[K + 2];
     end;
+  DetectSignatureColorMode(Signature);
   for Y := 0 to 31 do
     for U := 0 to 7 do
     begin
@@ -309,7 +425,7 @@ var
 begin
   Result := Default(TImageSignature);
   if (Graphic = nil) or Graphic.Empty then
-    raise EArgumentException.Create('Immagine vuota');
+    raise EArgumentException.Create(rsEmptyImage);
   Source := Vcl.Graphics.TBitmap.Create;
   try
     Source.PixelFormat := pf24bit;
@@ -416,8 +532,9 @@ begin
   FinishSignature(Result);
 end;
 
-function LoadSignature(const FileName: string; out Width, Height: Integer;
-  out DpiX, DpiY: Double): TImageSignature;
+procedure LoadImagePixels(const FileName: string; out Pixels: TBytes;
+  out Width, Height: Integer; out DpiX, DpiY: Double;
+  out Quality: TImageQualityMetrics);
 var
   Factory: IWICImagingFactory;
   Decoder: IWICBitmapDecoder;
@@ -425,7 +542,7 @@ var
   Converter: IWICFormatConverter;
   W, H, Stride: UINT;
   BufferSize: UInt64;
-  Pixels: TBytes;
+  DecodeResult: HRESULT;
   InitResult: HRESULT;
   UninitializeCOM: Boolean;
   PixelFormat: TGUID;
@@ -433,23 +550,35 @@ var
   PixelInfo: IWICPixelFormatInfo;
   BitsPerPixel, ChannelCount, ColorContextCount: UINT;
 begin
+  Quality := Default(TImageQualityMetrics);
   InitResult := CoInitializeEx(nil, COINIT_MULTITHREADED);
   UninitializeCOM := Succeeded(InitResult);
   if Failed(InitResult) and (InitResult <> RPC_E_CHANGED_MODE) then OleCheck(InitResult);
   try
     OleCheck(CoCreateInstance(CLSID_WICImagingFactory, nil,
       CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, Factory));
-    OleCheck(Factory.CreateDecoderFromFilename(PChar(FileName), GUID_NULL,
-      GENERIC_READ, WICDecodeMetadataCacheOnDemand, Decoder));
+    DecodeResult := Factory.CreateDecoderFromFilename(PChar(FileName), GUID_NULL,
+      GENERIC_READ, WICDecodeMetadataCacheOnDemand, Decoder);
+    if Cardinal(DecodeResult) = WINCODEC_ERR_COMPONENTNOTFOUND then
+      raise EInvalidGraphic.CreateFmt(rsImageDecoderUnavailable,
+        [ExtractFileExt(FileName)]);
+    OleCheck(DecodeResult);
+    // Always use frame zero, for both comparison and preview.
     OleCheck(Decoder.GetFrame(0, Frame));
     OleCheck(Frame.GetSize(W, H));
-    OleCheck(Frame.GetResolution(DpiX, DpiY));
+    DpiX := 96;
+    DpiY := 96;
+    if Failed(Frame.GetResolution(DpiX, DpiY)) then
+    begin
+      DpiX := 96;
+      DpiY := 96;
+    end;
     if (W = 0) or (H = 0) or (W > MaxInt div 4) then
-      raise EInvalidGraphic.Create('Dimensioni immagine non valide');
+      raise EInvalidGraphic.Create(rsInvalidImageDimensions);
     Stride := W * 4;
     BufferSize := UInt64(Stride) * H;
     if BufferSize > MaxInt then
-      raise EInvalidGraphic.Create('Immagine troppo grande');
+      raise EInvalidGraphic.Create(rsImageTooLarge);
     OleCheck(Factory.CreateFormatConverter(Converter));
     OleCheck(Converter.Initialize(Frame, GUID_WICPixelFormat32bppBGRA,
       WICBitmapDitherTypeNone, nil, 0, WICBitmapPaletteTypeCustom));
@@ -457,28 +586,28 @@ begin
     OleCheck(Converter.CopyPixels(nil, Stride, Length(Pixels), @Pixels[0]));
     Width := W;
     Height := H;
-    Result := SignatureFromBGRA(Pixels, Width, Height, Stride);
-    AnalyzePixels(Pixels, Width, Height, Stride, Result.Quality);
+
+
     if Succeeded(Frame.GetPixelFormat(PixelFormat)) and
       Succeeded(Factory.CreateComponentInfo(PixelFormat, ComponentInfo)) and
       Supports(ComponentInfo, IWICPixelFormatInfo, PixelInfo) then begin
       BitsPerPixel := 0; ChannelCount := 0;
       if Succeeded(PixelInfo.GetBitsPerPixel(BitsPerPixel)) and
         Succeeded(PixelInfo.GetChannelCount(ChannelCount)) and (ChannelCount > 0) then
-        Result.Quality.BitDepth := Ceil(BitsPerPixel / ChannelCount);
+        Quality.BitDepth := Ceil(BitsPerPixel / ChannelCount);
     end;
     ColorContextCount := 0;
     if Succeeded(Frame.GetColorContexts(0, nil, ColorContextCount)) then
-      Result.Quality.HasColorProfile := ColorContextCount > 0;
+      Quality.HasColorProfile := ColorContextCount > 0;
     if SameText(ExtractFileExt(FileName), '.jpg') or
       SameText(ExtractFileExt(FileName), '.jpeg') then
       try
-        Result.Quality.ChromaSubsampling := DetectJpegSubsampling(FileName);
+        Quality.ChromaSubsampling := DetectJpegSubsampling(FileName);
       except
-        Result.Quality.ChromaSubsampling := csUnknown;
+        Quality.ChromaSubsampling := csUnknown;
       end
     else
-      Result.Quality.ChromaSubsampling := csNotApplicable;
+      Quality.ChromaSubsampling := csNotApplicable;
   finally
     PixelInfo := nil;
     ComponentInfo := nil;
@@ -487,6 +616,59 @@ begin
     Decoder := nil;
     Factory := nil;
     if UninitializeCOM then CoUninitialize;
+  end;
+end;
+
+function LoadSignature(const FileName: string; out Width, Height: Integer;
+  out DpiX, DpiY: Double): TImageSignature;
+var
+  Pixels: TBytes;
+  Metadata: TImageQualityMetrics;
+begin
+  LoadImagePixels(FileName, Pixels, Width, Height, DpiX, DpiY, Metadata);
+  Result := SignatureFromBGRA(Pixels, Width, Height, Width * 4);
+  AnalyzePixels(Pixels, Width, Height, Width * 4, Result.Quality);
+  if Metadata.BitDepth > 0 then
+    Result.Quality.BitDepth := Metadata.BitDepth;
+  Result.Quality.HasColorProfile := Metadata.HasColorProfile;
+  Result.Quality.ChromaSubsampling := Metadata.ChromaSubsampling;
+end;
+
+procedure LoadImagePreview(const FileName: string; Picture: TPicture);
+var
+  Pixels: TBytes;
+  Width, Height, X, Y, Offset, Alpha: Integer;
+  DpiX, DpiY: Double;
+  Metadata: TImageQualityMetrics;
+  Bitmap: Vcl.Graphics.TBitmap;
+  Row: PPixelRow;
+begin
+  LoadImagePixels(FileName, Pixels, Width, Height, DpiX, DpiY, Metadata);
+  Bitmap := Vcl.Graphics.TBitmap.Create;
+  try
+    Bitmap.PixelFormat := pf24bit;
+    Bitmap.SetSize(Width, Height);
+    for Y := 0 to Height - 1 do
+    begin
+      // VCL ScanLine already maps top-down row indices to the DIB layout.
+      Row := Bitmap.ScanLine[Y];
+      Offset := Y * Width * 4;
+      for X := 0 to Width - 1 do
+      begin
+        // Match the white background used for transparent comparison pixels.
+        Alpha := Pixels[Offset + 3];
+        Row[X].rgbtBlue := (Pixels[Offset] * Alpha +
+          255 * (255 - Alpha) + 127) div 255;
+        Row[X].rgbtGreen := (Pixels[Offset + 1] * Alpha +
+          255 * (255 - Alpha) + 127) div 255;
+        Row[X].rgbtRed := (Pixels[Offset + 2] * Alpha +
+          255 * (255 - Alpha) + 127) div 255;
+        Inc(Offset, 4);
+      end;
+    end;
+    Picture.Assign(Bitmap);
+  finally
+    Bitmap.Free;
   end;
 end;
 

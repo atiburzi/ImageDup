@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{7F2FFD72-DDBB-4E80-BC8D-E534AD8433CB}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ImageDup.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ImageDup">
+        <MSBuild Projects="ImageDup.dproj"/>
+    </Target>
+    <Target Name="ImageDup:Clean">
+        <MSBuild Projects="ImageDup.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ImageDup:Make">
+        <MSBuild Projects="ImageDup.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ImageDup"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ImageDup:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ImageDup:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

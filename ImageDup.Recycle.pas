@@ -16,6 +16,14 @@ const
   RecycleOnDelete = $00080000; // FOFX_RECYCLEONDELETE (Windows 8+).
   AddUndoRecord = $20000000; // FOFX_ADDUNDORECORD.
 
+resourcestring
+  rsRecycleInitializationFailed='Unable to initialize Recycle Bin operations.';
+  rsFileUnavailable='File is not available.';
+  rsRecycleUnavailable='The Recycle Bin is unavailable; permanent deletion was blocked.';
+  rsOperationCancelled='The operation was cancelled or could not be completed.';
+  rsWindowsErrorFmt='Windows error 0x%.8x.';
+  rsFileNotRecycledFmt='The file was not moved to the Recycle Bin (0x%.8x).';
+
 type
   TRecycleSink = class(TInterfacedObject, IFileOperationProgressSink)
   public
@@ -121,14 +129,14 @@ begin
   ErrorText := '';
   InitResult := CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
   if Failed(InitResult) then begin
-    ErrorText := 'Impossibile inizializzare le operazioni del Cestino.';
+    ErrorText := rsRecycleInitializationFailed;
     Exit;
   end;
   try
     try
       FullPath := TPath.GetFullPath(FileName);
       if not FileExists(FullPath) then
-        raise EFileNotFoundException.Create('File non disponibile.');
+        raise EFileNotFoundException.Create(rsFileUnavailable);
       Operation := CreateComObject(CLSID_FileOperation) as IFileOperation;
       OleCheck(Operation.SetOwnerWindow(OwnerWindow));
       OleCheck(Operation.SetOperationFlags(RecycleOnDelete or AddUndoRecord or
@@ -145,12 +153,12 @@ begin
       Result := Sink.Recycled and not FileExists(FullPath);
       if not Result then begin
         if Sink.RefusedPermanentDelete then
-          ErrorText := 'Cestino non disponibile: cancellazione definitiva bloccata.'
-        else if Aborted then ErrorText := 'Operazione annullata o non completata.'
+          ErrorText := rsRecycleUnavailable
+        else if Aborted then ErrorText := rsOperationCancelled
         else if Failed(OperationResult) then
-          ErrorText := Format('Errore Windows 0x%.8x.', [Cardinal(OperationResult)])
+          ErrorText := Format(rsWindowsErrorFmt, [Cardinal(OperationResult)])
         else
-          ErrorText := Format('File non spostato nel Cestino (0x%.8x).',
+          ErrorText := Format(rsFileNotRecycledFmt,
             [Cardinal(Sink.DeleteResult)]);
       end;
     except
@@ -165,3 +173,5 @@ begin
 end;
 
 end.
+
+
