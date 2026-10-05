@@ -3,7 +3,8 @@ unit ImageDup.FormAbout;
 interface
 
 uses
-  System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Imaging.pngimage;
+  System.Classes, Vcl.Controls, Vcl.Forms, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Imaging.pngimage;
 
 type
   TFormAbout = class(TForm)
@@ -40,14 +41,10 @@ begin
   if InfoSize = 0 then
     Exit;
   SetLength(Buffer, InfoSize);
-  if not GetFileVersionInfo(PChar(Application.ExeName), Handle, InfoSize,
-    Buffer) then
+  if not GetFileVersionInfo(PChar(Application.ExeName), Handle, InfoSize, Buffer) then
     Exit;
-  if VerQueryValue(Buffer, '\', Pointer(FixedInfo), FixedInfoSize) and
-    (FixedInfoSize >= SizeOf(TVSFixedFileInfo)) then
-    Result := Format('%d.%d.%d.%d', [
-      HiWord(FixedInfo.dwFileVersionMS), LoWord(FixedInfo.dwFileVersionMS),
-      HiWord(FixedInfo.dwFileVersionLS), LoWord(FixedInfo.dwFileVersionLS)]);
+  if VerQueryValue(Buffer, '\', Pointer(FixedInfo), FixedInfoSize) and (FixedInfoSize >= SizeOf(TVSFixedFileInfo)) then
+    Result := Format('%d.%d.%d.%d', [HiWord(FixedInfo.dwFileVersionMS), LoWord(FixedInfo.dwFileVersionMS), HiWord(FixedInfo.dwFileVersionLS), LoWord(FixedInfo.dwFileVersionLS)]);
 end;
 
 procedure TFormAbout.FormCreate(Sender: TObject);

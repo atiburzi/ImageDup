@@ -3,8 +3,8 @@ unit ImageDup.Resource;
 interface
 
 uses
-  System.SysUtils, System.Classes, Vcl.BaseImageCollection, Vcl.ImageCollection, System.ImageList, Vcl.ImgList,
-  Vcl.VirtualImageList;
+  System.SysUtils, System.Classes, Vcl.ImageCollection,
+  Vcl.VirtualImageList, System.ImageList, Vcl.ImgList, Vcl.BaseImageCollection;
 
 type
   TDataModuleResources = class(TDataModule)

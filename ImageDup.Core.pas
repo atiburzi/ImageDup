@@ -67,8 +67,7 @@ function ImageColorModeText(Value: TImageColorMode): string;
 
 implementation
 
-uses System.Math, System.Types, System.Win.ComObj, Winapi.Windows, Winapi.ActiveX, Winapi.Wincodec,
-  Vcl.Imaging.jpeg, Vcl.Imaging.pngimage;
+uses System.Math, System.Types, System.Win.ComObj, Winapi.Windows, Winapi.ActiveX, Winapi.Wincodec;
 
 type
   TPixelRow = array[0..MaxInt div SizeOf(TRGBTriple) - 1] of TRGBTriple;

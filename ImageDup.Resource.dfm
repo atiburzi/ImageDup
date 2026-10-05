@@ -1,7 +1,6 @@
 object DataModuleResources: TDataModuleResources
-  Height = 750
-  Width = 1000
-  PixelsPerInch = 120
+  Height = 600
+  Width = 800
   object ImageCollection: TImageCollection
     Images = <
       item
@@ -21484,8 +21483,8 @@ object DataModuleResources: TDataModuleResources
               FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF}
           end>
       end>
-    Left = 80
-    Top = 48
+    Left = 64
+    Top = 38
   end
   object VirtualImageList32: TVirtualImageList
     AutoFill = True
@@ -21694,8 +21693,8 @@ object DataModuleResources: TDataModuleResources
     ImageCollection = ImageCollection
     Width = 32
     Height = 32
-    Left = 232
-    Top = 48
+    Left = 186
+    Top = 38
   end
   object VirtualImageList16: TVirtualImageList
     AutoFill = True
@@ -21902,8 +21901,8 @@ object DataModuleResources: TDataModuleResources
         Name = 'window-tile-vertical'
       end>
     ImageCollection = ImageCollection
-    Left = 541
-    Top = 48
+    Left = 433
+    Top = 38
   end
   object VirtualImageList24: TVirtualImageList
     AutoFill = True
@@ -22112,7 +22111,7 @@ object DataModuleResources: TDataModuleResources
     ImageCollection = ImageCollection
     Width = 24
     Height = 24
-    Left = 376
-    Top = 48
+    Left = 301
+    Top = 38
   end
 end

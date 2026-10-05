@@ -3,8 +3,8 @@ object FormSession: TFormSession
   Top = 0
   ActiveControl = ResultsTree
   Caption = 'ImageDup'
-  ClientHeight = 1145
-  ClientWidth = 1601
+  ClientHeight = 1137
+  ClientWidth = 1599
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -4452,29 +4452,27 @@ object FormSession: TFormSession
   TextHeight = 17
   object PreviewSplitter: TSplitter
     Left = 0
-    Top = 757
-    Width = 1601
-    Height = 7
+    Top = 750
+    Width = 1599
+    Height = 6
     Cursor = crVSplit
     Align = alBottom
     AutoSnap = False
     MinSize = 150
     ResizeStyle = rsUpdate
-    ExplicitLeft = 8
-    ExplicitTop = 896
-    ExplicitWidth = 1726
+    ExplicitTop = 757
+    ExplicitWidth = 1601
   end
   object SetupPanel: TPanel
     Left = 0
     Top = 48
-    Width = 1601
+    Width = 1599
     Height = 137
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 1599
     DesignSize = (
-      1601
+      1599
       137)
     object PathsLabel: TLabel
       Left = 16
@@ -4487,17 +4485,16 @@ object FormSession: TFormSession
     object PathsMemo: TMemo
       Left = 16
       Top = 31
-      Width = 1452
+      Width = 1450
       Height = 100
       Anchors = [akLeft, akTop, akRight]
       ScrollBars = ssVertical
       TabOrder = 0
       WordWrap = False
       OnChange = PathsMemoChange
-      ExplicitWidth = 1450
     end
     object BrowseButton: TButton
-      Left = 1474
+      Left = 1472
       Top = 31
       Width = 111
       Height = 100
@@ -4509,22 +4506,19 @@ object FormSession: TFormSession
       ImageMargins.Top = 20
       Images = DataModuleResources.VirtualImageList32
       TabOrder = 1
-      ExplicitLeft = 1472
     end
   end
   object ResultsPanel: TPanel
     Left = 0
     Top = 185
-    Width = 1601
-    Height = 572
+    Width = 1599
+    Height = 565
     Align = alClient
     BevelOuter = bvNone
     Constraints.MinHeight = 100
     Padding.Left = 16
     Padding.Right = 16
     TabOrder = 1
-    ExplicitWidth = 1599
-    ExplicitHeight = 564
     object ResultsLabel: TLabel
       Left = 16
       Top = 0
@@ -4541,7 +4535,7 @@ object FormSession: TFormSession
       Left = 16
       Top = 30
       Width = 1569
-      Height = 542
+      Height = 543
       Hint = 
         'Expand groups, select a file to compare it, and use the checkbox' +
         ' to mark it.'
@@ -4570,6 +4564,8 @@ object FormSession: TFormSession
       OnNodeDblClick = ResultsTreeNodeDblClick
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+      ExplicitWidth = 1567
+      ExplicitHeight = 535
       Columns = <
         item
           Position = 0
@@ -4600,8 +4596,8 @@ object FormSession: TFormSession
   end
   object PreviewPanel: TPanel
     Left = 0
-    Top = 764
-    Width = 1601
+    Top = 756
+    Width = 1599
     Height = 362
     Align = alBottom
     BevelOuter = bvNone
@@ -4614,8 +4610,6 @@ object FormSession: TFormSession
     ParentFont = False
     TabOrder = 2
     OnResize = PreviewPanelResize
-    ExplicitTop = 756
-    ExplicitWidth = 1599
     object PreviewScroll: TScrollBox
       Left = 0
       Top = 0
@@ -4634,7 +4628,7 @@ object FormSession: TFormSession
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 1601
+    Width = 1599
     Height = 48
     Margins.Left = 4
     Margins.Top = 4
@@ -4846,8 +4840,8 @@ object FormSession: TFormSession
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 1126
-    Width = 1601
+    Top = 1118
+    Width = 1599
     Height = 19
     Panels = <
       item
@@ -4858,8 +4852,6 @@ object FormSession: TFormSession
         Style = psOwnerDraw
         Width = 280
       end>
-    ExplicitTop = 1118
-    ExplicitWidth = 1599
   end
   object StatusProgress: TProgressBar
     Left = 1416

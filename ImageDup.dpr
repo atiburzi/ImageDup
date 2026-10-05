@@ -13,6 +13,7 @@ uses
   ImageDup.Recycle in 'ImageDup.Recycle.pas',
   ImageDup.FileMove in 'ImageDup.FileMove.pas',
   ImageDup.Core in 'ImageDup.Core.pas',
+  ImageDup.Settings in 'ImageDup.Settings.pas',
   Vcl.Themes,
   Vcl.Styles,
   ImageDup.Resource in 'ImageDup.Resource.pas' {DataModuleResources: TDataModule};
@@ -26,7 +27,8 @@ resourcestring
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  TStyleManager.TrySetStyle('Windows Modern SlateGray');
+  TStyleManager.TrySetStyle('Windows10');
+  RestoreApplicationStyle;
   Application.Title := 'ImageDup';
   Application.CreateForm(TFormMain, FormMain);
   Application.CreateForm(TDataModuleResources, DataModuleResources);

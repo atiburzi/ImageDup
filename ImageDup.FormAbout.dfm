@@ -4,8 +4,8 @@ object FormAbout: TFormAbout
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'About ImageDup'
-  ClientHeight = 269
-  ClientWidth = 477
+  ClientHeight = 261
+  ClientWidth = 475
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

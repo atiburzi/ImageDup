@@ -4,9 +4,10 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, System.SysUtils, System.Classes, System.Types, System.Generics.Collections, System.UITypes, Vcl.Graphics, Vcl.Controls,
-  Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Menus, VirtualTrees, VirtualTrees.Types, ImageDup.Scan, ImageDup.FormMain, ImageDup.Resource,
-  ImageDup.Groups, VirtualTrees.BaseAncestorVCL, VirtualTrees.BaseTree, VirtualTrees.AncestorVCL, Vcl.ToolWin, System.Actions, Vcl.ActnList,
-  Vcl.BaseImageCollection, Vcl.ImageCollection, System.ImageList, Vcl.ImgList, Vcl.VirtualImageList;
+  Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Menus, VirtualTrees, VirtualTrees.Types, ImageDup.Scan, ImageDup.FormMain,
+  ImageDup.Groups, VirtualTrees.BaseTree, System.Actions, Vcl.ActnList,
+  Vcl.ImgList, Vcl.ToolWin, VirtualTrees.BaseAncestorVCL,
+  VirtualTrees.AncestorVCL;
 
 type
   TNodeKind = (nkGroup, nkFile);
@@ -320,7 +321,7 @@ uses
   System.IOUtils, System.Math, ImageDup.Session, ImageDup.Core, ImageDup.Recycle,
   ImageDup.Options, ImageDup.ExcelExport, ImageDup.FormAbout,
   ImageDup.FileMove, Winapi.ShlObj, Winapi.ActiveX,
-  Vcl.Imaging.jpeg, Vcl.Imaging.pngimage;
+  Vcl.Imaging.pngimage;
 
 const
   crImageZoomIn = TCursor(1);
@@ -1585,18 +1586,19 @@ end;
 procedure TFormSession.RemoveRecycledFiles(const FileNames: TArray<string>);
 var
   Removed: TDictionary<string, Boolean>;
+  ClassCounts: TDictionary<Integer, Integer>;
   Members: TList<TGroupMember>;
   Group: TImageGroup;
   Member: TGroupMember;
-  Signatures: TArray<TImageSignature>;
-  Available: TArray<Boolean>;
-  Metrics: TComparison;
-  G, I, J, ReferenceIndex: Integer;
+  G, I, Count: Integer;
   FileName, FocusFile: string;
-  Changed: Boolean;
+  Changed, ReferenceRemoved: Boolean;
 begin
+  if Length(FileNames) = 0 then
+    Exit;
   FocusFile := FocusedFileName;
   Removed := TDictionary<string, Boolean>.Create;
+  ClassCounts := TDictionary<Integer, Integer>.Create;
   Members := TList<TGroupMember>.Create;
   try
     for FileName in FileNames do
@@ -1609,54 +1611,46 @@ begin
       Group := FGroups[G];
       Members.Clear;
       Changed := False;
+      ReferenceRemoved := False;
       for Member in Group.Members do
         if Removed.ContainsKey(Member.Info.FileName) then
-          Changed := True
+        begin
+          Changed := True;
+          ReferenceRemoved := ReferenceRemoved or Member.IsReference;
+        end
         else
           Members.Add(Member);
       if not Changed then
         Continue;
       if Members.Count = 0 then
       begin
+        FMetricReferences.Remove(Group.Id);
         FGroups.Delete(G);
         Continue;
       end;
       Group.Members := Members.ToArray;
       CalculateGroupQuality(Group);
-      ReferenceIndex := ReferenceMemberIndex(Group);
-      SetLength(Signatures, Length(Group.Members));
-      SetLength(Available, Length(Group.Members));
-      for I := 0 to High(Group.Members) do
+
+      // ExactClass was established during the scan. Removing members cannot
+      // change the equivalence of the remaining files, so no image decoding
+      // or pairwise comparison is needed here.
+      ClassCounts.Clear;
+      for Member in Group.Members do
       begin
-        Group.Members[I].HasIdenticalPeer := False;
-        Available[I] := False;
-        try
-          Signatures[I] := LoadSignature(Group.Members[I].Info.FileName);
-          Available[I] := True;
-        except
-          on E: Exception do
-            FErrors.Add(Group.Members[I].Info.FileName + ': ' + E.Message);
-        end;
+        Count := 0;
+        ClassCounts.TryGetValue(Member.ExactClass, Count);
+        ClassCounts.AddOrSetValue(Member.ExactClass, Count + 1);
       end;
       for I := 0 to High(Group.Members) do
       begin
-        Group.Members[I].Metrics := Default(TComparison);
-        if (ReferenceIndex >= 0) and Available[ReferenceIndex] and Available[I] then
-          StructuralMetrics(Signatures[ReferenceIndex], Signatures[I],
-            Group.Members[I].Metrics);
-        if not Available[I] then
-          Continue;
-        for J := 0 to I - 1 do
-          if Available[J] then
-          begin
-            StructuralMetrics(Signatures[J], Signatures[I], Metrics);
-            if (Metrics.Distance = 0) and (Metrics.RGBError <= 1E-12) then
-            begin
-              Group.Members[J].HasIdenticalPeer := True;
-              Group.Members[I].HasIdenticalPeer := True;
-            end;
-          end;
+        Count := 0;
+        ClassCounts.TryGetValue(Group.Members[I].ExactClass, Count);
+        Group.Members[I].HasIdenticalPeer := Count > 1;
+        if ReferenceRemoved then
+          Group.Members[I].Metrics := Default(TComparison);
       end;
+      if ReferenceRemoved then
+        FMetricReferences.Remove(Group.Id);
       FGroups[G] := Group;
     end;
     if FSortColumn = 0 then
@@ -1665,10 +1659,10 @@ begin
       SortMembers(FSortColumn, FSortAscending);
     ClearPreviews;
     BuildTree(False, FocusFile);
-    if Length(FileNames) > 0 then
-      SetModified(True);
+    SetModified(True);
   finally
     Members.Free;
+    ClassCounts.Free;
     Removed.Free;
   end;
 end;

@@ -5,6 +5,25 @@ object FormMain: TFormMain
   ClientHeight = 800
   ClientWidth = 1280
   Color = clAppWorkSpace
+  CustomTitleBar.Control = TitleBarPanel
+  CustomTitleBar.Enabled = True
+  CustomTitleBar.Height = 40
+  CustomTitleBar.SystemHeight = False
+  CustomTitleBar.StyleColors = True
+  CustomTitleBar.SystemColors = False
+  CustomTitleBar.SystemButtons = False
+  CustomTitleBar.BackgroundColor = 5854282
+  CustomTitleBar.ForegroundColor = clWhite
+  CustomTitleBar.InactiveBackgroundColor = clWhite
+  CustomTitleBar.InactiveForegroundColor = 10066329
+  CustomTitleBar.ButtonForegroundColor = clWhite
+  CustomTitleBar.ButtonBackgroundColor = 5854282
+  CustomTitleBar.ButtonHoverForegroundColor = clWhite
+  CustomTitleBar.ButtonHoverBackgroundColor = 7433310
+  CustomTitleBar.ButtonPressedForegroundColor = 65793
+  CustomTitleBar.ButtonPressedBackgroundColor = 9604221
+  CustomTitleBar.ButtonInactiveForegroundColor = 10066329
+  CustomTitleBar.ButtonInactiveBackgroundColor = clWhite
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -13
@@ -12,6 +31,8 @@ object FormMain: TFormMain
   Font.Style = []
   FormStyle = fsMDIForm
   VisualManager = FormTabsBar
+  GlassFrame.Enabled = True
+  GlassFrame.Top = 40
   Icon.Data = {
     0000010009000000000001002000B20C0100960000006060000001002000A894
     0000480D0100404000000100200028420000F0A101003030000001002000A825
@@ -4697,24 +4718,75 @@ object FormMain: TFormMain
     000000000000000000000000000000000000000000000000FFFF0000FFFF0000
     FFF10000C0010000800100008003000080030000800300008003000080030000
     8003000080030000F8030000F8030000FFFF0000FFFF0000}
-  Menu = MainMenu
   Position = poScreenCenter
+  StyleElements = [seFont, seClient]
+  OnCreate = FormCreate
+  OnResize = FormResize
   OnShow = FormShow
   TextHeight = 17
-  object ToolBar: TToolBar
+  object TitleBarPanel: TTitleBarPanel
     Left = 0
     Top = 0
     Width = 1280
+    Height = 39
+    CustomButtons = <>
+    DesignSize = (
+      1280
+      39)
+    object StyleComboBox: TComboBox
+      Left = 992
+      Top = 7
+      Width = 140
+      Height = 25
+      Hint = 'Change the application style'
+      Style = csDropDownList
+      Anchors = [akTop, akRight]
+      Sorted = True
+      TabOrder = 0
+      OnChange = StyleComboBoxChange
+    end
+  end
+  object MenuBar: TToolBar
+    Left = 0
+    Top = 39
+    Width = 1280
+    Height = 23
+    ButtonHeight = 23
+    ButtonWidth = 59
+    List = True
+    Menu = MainMenu
+    ShowCaptions = True
+    TabOrder = 1
+    Wrapable = False
+  end
+  object FormTabsBar: TFormTabsBar
+    Left = 0
+    Top = 102
+    Width = 1280
+    Height = 30
+    ParentColor = False
+    TabOptions.ShowFormIcon = True
+    TabOptions.ShowFormSystemMenu = True
+    TabOptions.ShowCloseButton = True
+    TabOptions.ShowHintForTruncatedCaption = True
+    TabMinWidth = 100
+    TabMaxWidth = 250
+    ShowTabsMenuButton = True
+  end
+  object ToolBar: TToolBar
+    Left = 0
+    Top = 62
+    Width = 1280
     Height = 40
+    AutoSize = True
     ButtonHeight = 38
-    ButtonWidth = 134
+    ButtonWidth = 119
     Flat = False
     HideClippedButtons = True
     Images = DataModuleResources.VirtualImageList32
     List = True
     AllowTextButtons = True
-    TabOrder = 0
-    ExplicitWidth = 1278
+    TabOrder = 3
     object ToolButtonNew: TToolButton
       Left = 0
       Top = 0
@@ -4739,57 +4811,18 @@ object FormMain: TFormMain
       Width = 10
       Style = tbsSeparator
     end
-    object ToolButtonCascade: TToolButton
-      Left = 374
-      Top = 0
-      Action = ActionCascade
-      Style = tbsTextButton
-    end
-    object ToolButtonTileHorizontal: TToolButton
-      Left = 470
-      Top = 0
-      Action = ActionTileHorizontal
-      Style = tbsTextButton
-    end
-    object ToolButtonTileVertical: TToolButton
-      Left = 608
-      Top = 0
-      Action = ActionTileVertical
-      Style = tbsTextButton
-    end
-    object ToolButtonWindowSeparator: TToolButton
-      Left = 729
-      Top = 0
-      Width = 10
-      Style = tbsSeparator
-    end
     object ToolButtonAbout: TToolButton
-      Left = 739
+      Left = 374
       Top = 0
       Action = ActionAbout
       Style = tbsTextButton
     end
   end
-  object FormTabsBar: TFormTabsBar
-    Left = 0
-    Top = 40
-    Width = 1280
-    Height = 30
-    ParentColor = False
-    TabOptions.ShowFormIcon = True
-    TabOptions.ShowFormSystemMenu = True
-    TabOptions.ShowCloseButton = True
-    TabOptions.ShowHintForTruncatedCaption = True
-    TabMinWidth = 100
-    TabMaxWidth = 250
-    ShowTabsMenuButton = True
-    ExplicitWidth = 1278
-  end
   object ActionList: TActionList
     Images = DataModuleResources.VirtualImageList32
     OnUpdate = ActionListUpdate
-    Left = 32
-    Top = 104
+    Left = 88
+    Top = 176
     object ActionNewSession: TAction
       Category = 'File'
       Caption = 'New session'
@@ -4890,8 +4923,8 @@ object FormMain: TFormMain
       end>
     Options = [fdoAllowMultiSelect, fdoPathMustExist, fdoFileMustExist]
     Title = 'Load ImageDup sessions'
-    Left = 112
-    Top = 104
+    Left = 88
+    Top = 248
   end
   object SaveSessionDialog: TFileSaveDialog
     DefaultExtension = 'idup'
@@ -4903,13 +4936,13 @@ object FormMain: TFormMain
       end>
     Options = [fdoOverWritePrompt, fdoPathMustExist]
     Title = 'Save ImageDup session'
-    Left = 216
-    Top = 104
+    Left = 88
+    Top = 320
   end
   object MainMenu: TMainMenu
     Images = DataModuleResources.VirtualImageList24
-    Left = 296
-    Top = 104
+    Left = 88
+    Top = 392
     object FileMenu: TMenuItem
       Caption = '&File'
       object NewSessionMenuItem: TMenuItem
