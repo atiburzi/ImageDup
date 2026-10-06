@@ -1,12 +1,32 @@
 # ImageDup
 
+<p align="center">
+  <img src="Art/main.png" alt="ImageDup main window showing grouped matches, quality scores, and image previews" width="960"><br>
+  <em>The main window: similar-image groups, quality scores, and side-by-side previews.</em>
+</p>
+
+<p align="center">
+  <img alt="Platform: Windows" src="https://img.shields.io/badge/PLATFORM-WINDOWS-0088CC?style=for-the-badge&amp;labelColor=555555">
+  <img alt="Method: DCT and SSIM" src="https://img.shields.io/badge/METHOD-DCT%20%2B%20SSIM-44B76D?style=for-the-badge&amp;labelColor=555555">
+  <img alt="Language: Delphi" src="https://img.shields.io/badge/LANGUAGE-DELPHI-E02030?style=for-the-badge&amp;labelColor=555555">
+  <img alt="UI: VCL" src="https://img.shields.io/badge/UI-VCL-555555?style=for-the-badge&amp;labelColor=444444">
+</p>
+<p align="center">
+  <a href="LICENSE"><img alt="License: MPL 2.0" src="https://img.shields.io/badge/LICENSE-MPL%202.0-F5A000?style=for-the-badge&amp;labelColor=555555"></a>
+</p>
+<p align="center">
+  <a href="https://github.com/atiburzi/ImageDup/archive/refs/heads/main.zip"><img alt="Download source ZIP" src="https://img.shields.io/badge/DOWNLOAD-SOURCE%20ZIP-1684C1?style=for-the-badge&amp;labelColor=555555"></a>
+  <a href="https://github.com/atiburzi/ImageDup/issues"><img alt="Issues welcome" src="https://img.shields.io/badge/ISSUES-WELCOME-00A669?style=for-the-badge&amp;labelColor=555555"></a>
+  <a href="https://github.com/atiburzi/ImageDup/pulls"><img alt="Pull requests welcome" src="https://img.shields.io/badge/PRs-WELCOME-8B43DC?style=for-the-badge&amp;labelColor=555555"></a>
+</p>
+
 **Find, compare, rank, and manage visually similar images on Windows with Delphi 13 and VCL.**
 
 ImageDup compares image content to find resized copies, recompressions, and sufficiently similar variants. It organizes results into groups, calculates a technical quality ranking to help choose a reference, and lets you select, export, move, or send files to the Recycle Bin.
 
 The application uses an MDI interface: each child window holds an independent session with its own folders, options, results, and selections.
 
-This document describes the **source files in the project root**, reviewed on **24 September 2026**. The **oldgen/** directory contains the earlier version. The formulas and thresholds below reflect the current implementation; they are not descriptions of future features or benchmark results.
+The Delphi project is in [`Source/`](Source/); translations, icons, and artwork are kept separately. The formulas and thresholds below describe the current source, not benchmark results or planned features.
 
 ## Contents
 
@@ -26,6 +46,8 @@ This document describes the **source files in the project root**, reviewed on **
 14. [Threads and performance](#threads-and-performance)
 15. [Project structure and building](#project-structure-and-building)
 16. [Limitations, diagnostics, and validation](#limitations-diagnostics-and-validation)
+17. [Contributing](#contributing)
+18. [License](#license)
 
 ## Features and usage
 
@@ -81,7 +103,7 @@ The context menu on a file row or preview can set that file as the reference, se
 
 ## Formats and decoding
 
-The extension filter is centralized in **IsSupportedImageFile** in [ImageDup.Core.pas](ImageDup.Core.pas).
+The extension filter is centralized in **IsSupportedImageFile** in [ImageDup.Core.pas](Source/ImageDup.Core.pas).
 
 | Format | Extensions |
 |---|---|
@@ -484,7 +506,7 @@ A pair is accepted only when **all** checks pass:
 | Worst block SSIM | ≥ 0.80 |
 | Worst block RGB | RMSE ≤ 0.18 |
 
-The constants are in [ImageDup.Core.pas](ImageDup.Core.pas). MaxRGBError is an API parameter; the GUI scan passes **DefaultMaxRGBError=0.08**.
+The constants are in [ImageDup.Core.pas](Source/ImageDup.Core.pas). MaxRGBError is an API parameter; the GUI scan passes **DefaultMaxRGBError=0.08**.
 
 Checking the worst block prevents a localized difference from being hidden by a good global mean. It cannot recover a detail that vanished during downsampling.
 
@@ -550,7 +572,7 @@ Changing the reference updates displayed relationships and reference-based selec
 
 ## Quality ranking
 
-**CalculateGroupQuality** in [ImageDup.Groups.pas](ImageDup.Groups.pas) calculates the ranking. **AnalyzePixels** in [ImageDup.Core.pas](ImageDup.Core.pas) produces most of the underlying pixel metrics.
+**CalculateGroupQuality** in [ImageDup.Groups.pas](Source/ImageDup.Groups.pas) calculates the ranking. **AnalyzePixels** in [ImageDup.Core.pas](Source/ImageDup.Core.pas) produces most of the underlying pixel metrics.
 
 ### Actual weights
 
@@ -867,38 +889,47 @@ The DCT and RGB loops are not wholly implemented in assembly language.
 
 ## Project structure and building
 
+### Repository layout
+
+| Path | Contents |
+|---|---|
+| [`Source/`](Source/) | Delphi project, Pascal units, DFM forms, and embedded resources. |
+| [`Translations/ImageDup.xlat`](Translations/ImageDup.xlat) | Translation project. |
+| [`Assets/icons-v5-soft-blue/`](Assets/icons-v5-soft-blue/) | Application and action icons, including high-resolution PNG sources. |
+| [`Assets/cursors/`](Assets/cursors/) | Custom zoom cursor asset. |
+| [`Art/main.png`](Art/main.png) | Application screenshot used above. |
+| `Bin/` | Local binary/output directory; not required to read the source. |
+| [`LICENSE`](LICENSE) | Mozilla Public License 2.0. |
+
 ### Modules
 
 | File | Responsibility |
 |---|---|
-| [ImageDup.dpr](ImageDup.dpr) | Startup, resources, style, and creation of forms/data module. |
-| [ImageDup.FormMain.pas](ImageDup.FormMain.pas) | MDI container, documents, coordinated closing. |
-| [ImageDup.FormSession.pas](ImageDup.FormSession.pas) | Tree, selections, previews, commands, and session state. |
-| [ImageDup.Options.pas](ImageDup.Options.pas) | Scan options dialog. |
-| [ImageDup.Scan.pas](ImageDup.Scan.pas) | Enumeration, workers, and coordinator. |
-| [ImageDup.Core.pas](ImageDup.Core.pas) | WIC, signatures, DCT, RGB, SSIM, and pixel metrics. |
-| [ImageDup.Groups.pas](ImageDup.Groups.pas) | Grouping, identity, ranking, and reference. |
-| [ImageDup.Session.pas](ImageDup.Session.pas) | JSON session serialization. |
-| [ImageDup.ExcelExport.pas](ImageDup.ExcelExport.pas) | XLSX generation. |
-| [ImageDup.Recycle.pas](ImageDup.Recycle.pas) | Recycle Bin operations. |
-| [ImageDup.FileMove.pas](ImageDup.FileMove.pas) | Structure-preserving moves. |
-| [ImageDup.FormAbout.pas](ImageDup.FormAbout.pas) | About dialog. |
-| [ImageDup.Resource.pas](ImageDup.Resource.pas) | Shared ImageCollection and VirtualImageLists. |
-| **assets/** | Icons and cursors. |
-| **oldgen/** | Earlier version. |
+| [ImageDup.dpr](Source/ImageDup.dpr) | Startup, resources, style, and creation of forms/data module. |
+| [ImageDup.FormMain.pas](Source/ImageDup.FormMain.pas) | MDI container, documents, coordinated closing. |
+| [ImageDup.FormSession.pas](Source/ImageDup.FormSession.pas) | Tree, selections, previews, commands, and session state. |
+| [ImageDup.Options.pas](Source/ImageDup.Options.pas) | Scan options dialog. |
+| [ImageDup.Scan.pas](Source/ImageDup.Scan.pas) | Enumeration, workers, and coordinator. |
+| [ImageDup.Core.pas](Source/ImageDup.Core.pas) | WIC, signatures, DCT, RGB, SSIM, and pixel metrics. |
+| [ImageDup.Groups.pas](Source/ImageDup.Groups.pas) | Grouping, identity, ranking, and reference. |
+| [ImageDup.Session.pas](Source/ImageDup.Session.pas) | JSON session serialization. |
+| [ImageDup.ExcelExport.pas](Source/ImageDup.ExcelExport.pas) | XLSX generation. |
+| [ImageDup.Recycle.pas](Source/ImageDup.Recycle.pas) | Recycle Bin operations. |
+| [ImageDup.FileMove.pas](Source/ImageDup.FileMove.pas) | Structure-preserving moves. |
+| [ImageDup.FormAbout.pas](Source/ImageDup.FormAbout.pas) | About dialog. |
+| [ImageDup.Resource.pas](Source/ImageDup.Resource.pas) | Shared ImageCollection and VirtualImageLists. |
 
 Forms and the data module have accompanying DFM files. Actions connect visual controls and menus to application logic.
 
 ### Development requirements
 
 - Windows and Delphi 13 with VCL.
-- Virtual Treeview units/packages available to the IDE for the selected platform.
-- WIC decoders for the image formats to be used.
-- Project resources and VCL style configuration.
+- Virtual Treeview units/packages installed for the selected platform and visible to the Delphi IDE.
+- WIC decoders for the image formats you intend to scan; WebP and HEIC/HEIF support depends on installed Windows codecs.
 
-Open **ImageDup.dproj in the project root**, check local dependency paths, and select Win32 or Win64. Platform entries automatically generated in the dproj do not make this VCL application compatible with Android, macOS, or Linux.
+Clone the repository and open [`Source/ImageDup.dproj`](Source/ImageDup.dproj) in Delphi. Select **Win32** or **Win64** and build the project in the IDE. The project file and its Pascal/DFM/resources are in `Source/`; icon paths point to `../Assets/`. For Win64, the executable and compiler output are configured in `Bin/` at the repository root; Win32 still uses `Source/Win32/`. Existing binaries are local artifacts and may not match the current source. No prebuilt executable is required to browse the repository.
 
-Executables and DCUs already in the directory may come from older builds and may not match the current sources.
+Platform entries generated in the project file do not make this VCL application compatible with Android, macOS, or Linux.
 
 ### Resources and styles
 
@@ -909,17 +940,13 @@ The DPR needs both directives:
 {$R *.dres}
 ~~~
 
-The main resource contains project elements, including style resources. Additional resources include the zoom cursor, also defined in **ImageDupResource.rc**.
+[`Source/ImageDup.res`](Source/ImageDup.res) contains the application resources. Delphi also generates a `.dres` file for the VCL styles listed in the project options. The bundled style names are Windows10, Windows10 Blue, Windows10 Dark, Windows10 Green, Windows10 Purple, and Windows10 SlateGray; the combo box displays shorter translated captions.
 
-The currently requested style is **Windows Modern SlateGray**, with its VSF specified in the project properties. The name passed to TStyleManager must match a style actually embedded or loaded.
-
-For “Style ... not found”, check both Custom_Styles and inclusion of *.res. Merely having a VSF on disk is insufficient if its resources are not linked into the executable.
+Startup selects Windows10, then restores the last chosen style from the current user's `Software\ImageDup` registry key. If the saved style is unavailable, startup falls back to the default. The internal style name must match a style actually embedded or loaded. For “Style ... not found”, check `Custom_Styles` and both resource directives; a VSF file on disk alone is insufficient.
 
 ### Localization
 
-The interface uses English text. Extracted code strings are resourcestring declarations with the **rs** prefix near their use; captions and hints also appear in DFM files.
-
-The current project has no central ImageDup.Strings unit. Complete translation must account for resourcestrings, DFM properties, and any remaining literal strings in source.
+The interface uses English text. Extracted code strings are `resourcestring` declarations with the **rs** prefix near their use; captions and hints also appear in DFM files. [`Translations/ImageDup.xlat`](Translations/ImageDup.xlat) contains the translation project. Complete localization must account for resourcestrings, DFM properties, and any remaining literal strings in source; the `.xlat` file is not a runtime dependency for the default English build.
 
 ## Limitations, diagnostics, and validation
 
@@ -1001,3 +1028,13 @@ Implementation details in this README come from the project source. For theory a
 - [Microsoft: HEIF codec through WIC](https://learn.microsoft.com/en-us/windows/win32/wic/heif-codec).
 
 SciPy and pHash are theoretical references, not ImageDup runtime dependencies.
+
+## Contributing
+
+Bug reports and pull requests are welcome. For comparison errors, include the image formats, scan options, expected and actual grouping, and a small reproducible set of images you have permission to share. For UI or build problems, include the Delphi version, Windows version, target platform, and exact error message. Please avoid posting private image collections or personal file paths in public issues.
+
+Changes to the perceptual matching or ranking logic should explain the effect on false positives and false negatives. The validation strategy above lists useful regression cases.
+
+## License
+
+ImageDup is distributed under the [Mozilla Public License 2.0](LICENSE). See the license file for its terms.

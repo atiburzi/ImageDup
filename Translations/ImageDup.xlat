@@ -12,14 +12,14 @@
     <omitnewstate>True</omitnewstate>
     <transient>False</transient>
   </options>
-  <project sourcefile=".\ImageDup.exe" stringsymbolfile=".\ImageDup.drc" language="en">
+  <project sourcefile="..\Bin\ImageDup.exe" stringsymbolfile=".\ImageDup.drc" language="en">
     <targetlanguages>
+      <language language="pt"/>
       <language language="fr"/>
       <language language="it"/>
       <language language="de"/>
       <language language="es"/>
       <language language="it-IT"/>
-      <language language="pt"/>
     </targetlanguages>
     <modules>
       <module name="resourcestrings" type="strings">
@@ -29,8 +29,8 @@
               <property>
                 <value>grayscale</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">scala di grigi</translation>
                   <translation language="fr" status="proposed">niveaux de gris</translation>
+                  <translation language="it-IT" status="proposed">scala di grigi</translation>
                 </translations>
               </property>
             </properties>
@@ -40,8 +40,8 @@
               <property>
                 <value>other</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">altro</translation>
                   <translation language="fr" status="proposed">autre</translation>
+                  <translation language="it-IT" status="proposed">altro</translation>
                 </translations>
               </property>
             </properties>
@@ -51,8 +51,8 @@
               <property>
                 <value>color</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">colore</translation>
                   <translation language="fr" status="proposed">couleur</translation>
+                  <translation language="it-IT" status="proposed">colore</translation>
                 </translations>
               </property>
             </properties>
@@ -62,8 +62,8 @@
               <property>
                 <value>grayscale</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">scala di grigi</translation>
                   <translation language="fr" status="proposed">niveaux de gris</translation>
+                  <translation language="it-IT" status="proposed">scala di grigi</translation>
                 </translations>
               </property>
             </properties>
@@ -73,8 +73,8 @@
               <property>
                 <value>monochrome</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">monocromatico</translation>
                   <translation language="fr" status="proposed">monochrome</translation>
+                  <translation language="it-IT" status="proposed">monocromatico</translation>
                 </translations>
               </property>
             </properties>
@@ -94,8 +94,8 @@
               <property>
                 <value>Image is too large</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">L'immagine è troppo grande</translation>
                   <translation language="fr" status="proposed">L'image est trop grande</translation>
+                  <translation language="it-IT" status="proposed">L'immagine è troppo grande</translation>
                 </translations>
               </property>
             </properties>
@@ -105,8 +105,8 @@
               <property>
                 <value>Invalid image dimensions</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Dimensioni immagine non valide</translation>
                   <translation language="fr" status="proposed">Dimensions d'image non valides</translation>
+                  <translation language="it-IT" status="proposed">Dimensioni immagine non valide</translation>
                 </translations>
               </property>
             </properties>
@@ -116,8 +116,8 @@
               <property>
                 <value>Truncated JPEG file</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">File JPEG troncato</translation>
                   <translation language="fr" status="proposed">Fichier JPEG tronqué</translation>
+                  <translation language="it-IT" status="proposed">File JPEG troncato</translation>
                 </translations>
               </property>
             </properties>
@@ -127,8 +127,8 @@
               <property>
                 <value>unknown</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">sconosciuto</translation>
                   <translation language="fr" status="proposed">inconnu</translation>
+                  <translation language="it-IT" status="proposed">sconosciuto</translation>
                 </translations>
               </property>
             </properties>
@@ -158,8 +158,8 @@
               <property>
                 <value>Bytes</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Bytes</translation>
                   <translation language="fr" status="proposed">Octets</translation>
+                  <translation language="it-IT" status="proposed">Bytes</translation>
                 </translations>
               </property>
             </properties>
@@ -169,8 +169,8 @@
               <property>
                 <value>Date and time</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Data e ora</translation>
                   <translation language="fr" status="proposed">Date et heure</translation>
+                  <translation language="it-IT" status="proposed">Data e ora</translation>
                 </translations>
               </property>
             </properties>
@@ -180,8 +180,8 @@
               <property>
                 <value>Different from reference</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Diverso dal riferimento</translation>
                   <translation language="fr" status="proposed">Différent de la référence</translation>
+                  <translation language="it-IT" status="proposed">Diverso dal riferimento</translation>
                 </translations>
               </property>
             </properties>
@@ -191,8 +191,8 @@
               <property>
                 <value>File</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">File</translation>
                   <translation language="fr" status="proposed">Fichier</translation>
+                  <translation language="it-IT" status="proposed">File</translation>
                 </translations>
               </property>
             </properties>
@@ -202,8 +202,8 @@
               <property>
                 <value>Filename</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Nome file</translation>
                   <translation language="fr" status="proposed">Nom de fichier</translation>
+                  <translation language="it-IT" status="proposed">Nome file</translation>
                 </translations>
               </property>
             </properties>
@@ -213,8 +213,8 @@
               <property>
                 <value>File path</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Percorso del file</translation>
                   <translation language="fr" status="proposed">Chemin d'accès au fichier</translation>
+                  <translation language="it-IT" status="proposed">Percorso del file</translation>
                 </translations>
               </property>
             </properties>
@@ -224,8 +224,8 @@
               <property>
                 <value>Group</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Gruppo</translation>
                   <translation language="fr" status="proposed">Groupe</translation>
+                  <translation language="it-IT" status="proposed">Gruppo</translation>
                 </translations>
               </property>
             </properties>
@@ -235,8 +235,8 @@
               <property>
                 <value>Identical to reference</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Identico al riferimento</translation>
                   <translation language="fr" status="proposed">Identique à la référence</translation>
+                  <translation language="it-IT" status="proposed">Identico al riferimento</translation>
                 </translations>
               </property>
             </properties>
@@ -246,8 +246,8 @@
               <property>
                 <value>Pixels</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Pixels</translation>
                   <translation language="fr" status="proposed">Pixels</translation>
+                  <translation language="it-IT" status="proposed">Pixels</translation>
                 </translations>
               </property>
             </properties>
@@ -257,8 +257,8 @@
               <property>
                 <value>Quality</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Qualità</translation>
                   <translation language="fr" status="proposed">Qualité</translation>
+                  <translation language="it-IT" status="proposed">Qualità</translation>
                 </translations>
               </property>
             </properties>
@@ -268,8 +268,8 @@
               <property>
                 <value>Reference</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Riferimento</translation>
                   <translation language="fr" status="proposed">Référence</translation>
+                  <translation language="it-IT" status="proposed">Riferimento</translation>
                 </translations>
               </property>
             </properties>
@@ -279,8 +279,8 @@
               <property>
                 <value>Relationship</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Relazione</translation>
                   <translation language="fr" status="proposed">Relation</translation>
+                  <translation language="it-IT" status="proposed">Relazione</translation>
                 </translations>
               </property>
             </properties>
@@ -290,8 +290,8 @@
               <property>
                 <value>Selected</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Selezionato</translation>
                   <translation language="fr" status="proposed">Sélectionné</translation>
+                  <translation language="it-IT" status="proposed">Selezionato</translation>
                 </translations>
               </property>
             </properties>
@@ -301,8 +301,8 @@
               <property>
                 <value>no</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">no</translation>
                   <translation language="fr" status="proposed">non</translation>
+                  <translation language="it-IT" status="proposed">no</translation>
                 </translations>
               </property>
             </properties>
@@ -312,8 +312,8 @@
               <property>
                 <value>yes</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">sì</translation>
                   <translation language="fr" status="proposed">oui</translation>
+                  <translation language="it-IT" status="proposed">sì</translation>
                 </translations>
               </property>
             </properties>
@@ -323,8 +323,8 @@
               <property>
                 <value>The destination file already exists: %s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Il file di destinazione esiste già: %s</translation>
                   <translation language="fr" status="proposed">Le fichier de destination existe déjà : %s</translation>
+                  <translation language="it-IT" status="proposed">Il file di destinazione esiste già: %s</translation>
                 </translations>
               </property>
             </properties>
@@ -334,8 +334,8 @@
               <property>
                 <value>The source and destination are the same.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">L'origine e la destinazione sono le stesse.</translation>
                   <translation language="fr" status="proposed">La source et la destination sont identiques.</translation>
+                  <translation language="it-IT" status="proposed">L'origine e la destinazione sono le stesse.</translation>
                 </translations>
               </property>
             </properties>
@@ -345,8 +345,8 @@
               <property>
                 <value>Version %s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Versione %s</translation>
                   <translation language="fr" status="proposed">Version %s</translation>
+                  <translation language="it-IT" status="proposed">Versione %s</translation>
                 </translations>
               </property>
             </properties>
@@ -356,8 +356,8 @@
               <property>
                 <value>One or more sessions are busy. Stop the current operations before closing ImageDup.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Una o più sessioni sono in corso. Interrompere le operazioni in corso prima di chiudere ImageDup.</translation>
                   <translation language="fr" status="proposed">Une ou plusieurs sessions sont en cours. Arrêtez les opérations en cours avant de fermer ImageDup.</translation>
+                  <translation language="it-IT" status="proposed">Una o più sessioni sono in corso. Interrompere le operazioni in corso prima di chiudere ImageDup.</translation>
                 </translations>
               </property>
             </properties>
@@ -367,8 +367,8 @@
               <property>
                 <value>Unable to load the session:%s%s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Impossibile caricare la sessione: %s%s</translation>
                   <translation language="fr" status="proposed">Impossible de charger la session : %s%s</translation>
+                  <translation language="it-IT" status="proposed">Impossibile caricare la sessione: %s%s</translation>
                 </translations>
               </property>
             </properties>
@@ -378,8 +378,98 @@
               <property>
                 <value>Unable to save the session:%s%s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Impossibile salvare la sessione: %s%s</translation>
                   <translation language="fr" status="proposed">Impossible d'enregistrer la session : %s%s</translation>
+                  <translation language="it-IT" status="proposed">Impossibile salvare la sessione: %s%s</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_FormMain_rsStyleBlue">
+            <properties>
+              <property>
+                <value>Blue Theme</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Tema blu</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_FormMain_rsStyleChangeErrorFmt">
+            <properties>
+              <property>
+                <value>Unable to apply GUI style %s:%s%s</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Impossibile applicare lo stile GUI %s:%s%s</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_FormMain_rsStyleDark">
+            <properties>
+              <property>
+                <value>Dark Theme</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Tema scuro</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_FormMain_rsStyleGreen">
+            <properties>
+              <property>
+                <value>Green Theme</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Tema verde</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_FormMain_rsStyleLight">
+            <properties>
+              <property>
+                <value>Light Theme</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Tema chiaro</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_FormMain_rsStylePreferenceSaveErrorFmt">
+            <properties>
+              <property>
+                <value>The GUI style was applied, but the preference could not be saved:%s%s</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Lo stile dell'interfaccia grafica è stato applicato, ma non è stato possibile salvare l'impostazione: %s%s</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_FormMain_rsStylePurple">
+            <properties>
+              <property>
+                <value>Purple Theme</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Tema viola</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_FormMain_rsStyleSlateGray">
+            <properties>
+              <property>
+                <value>Slate Gray Theme</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Tema grigio ardesia</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_FormMain_rsStyleUnavailable">
+            <properties>
+              <property>
+                <value>The selected style is unavailable.</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Lo stile selezionato non è disponibile.</translation>
                 </translations>
               </property>
             </properties>
@@ -389,8 +479,8 @@
               <property>
                 <value>Session %d</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Sessione %d</translation>
                   <translation language="fr" status="proposed">Session %d</translation>
+                  <translation language="it-IT" status="proposed">Sessione %d</translation>
                 </translations>
               </property>
             </properties>
@@ -400,8 +490,8 @@
               <property>
                 <value>Add folders to the search</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Aggiungi cartelle alla ricerca</translation>
                   <translation language="fr" status="proposed">Ajouter des dossiers à la recherche</translation>
+                  <translation language="it-IT" status="proposed">Aggiungi cartelle alla ricerca</translation>
                 </translations>
               </property>
             </properties>
@@ -411,8 +501,8 @@
               <property>
                 <value>All selections have been cleared.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Tutte le selezioni sono state cancellate.</translation>
                   <translation language="fr" status="proposed">Toutes les sélections ont été effacées.</translation>
+                  <translation language="it-IT" status="proposed">Tutte le selezioni sono state cancellate.</translation>
                 </translations>
               </property>
             </properties>
@@ -422,8 +512,8 @@
               <property>
                 <value>Automatic selection applied to all groups.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Selezione automatica applicata a tutti i gruppi.</translation>
                   <translation language="fr" status="proposed">La sélection automatique s'applique à tous les groupes.</translation>
+                  <translation language="it-IT" status="proposed">Selezione automatica applicata a tutti i gruppi.</translation>
                 </translations>
               </property>
             </properties>
@@ -433,8 +523,8 @@
               <property>
                 <value>%d bytes</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">%d byte</translation>
                   <translation language="fr" status="proposed">%d octets</translation>
+                  <translation language="it-IT" status="proposed">%d byte</translation>
                 </translations>
               </property>
             </properties>
@@ -444,8 +534,8 @@
               <property>
                 <value>%d B</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">%d B</translation>
                   <translation language="fr" status="proposed">%d B</translation>
+                  <translation language="it-IT" status="proposed">%d B</translation>
                 </translations>
               </property>
             </properties>
@@ -455,8 +545,8 @@
               <property>
                 <value>Distance %d | RGB %.4f | SSIM %.4f | minimum %.4f</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Distanza %d | RGB %.4f | SSIM %.4f | minimo %.4f</translation>
                   <translation language="fr" status="proposed">Distance %d | RVB %.4f | SSIM %.4f | minimum %.4f</translation>
+                  <translation language="it-IT" status="proposed">Distanza %d | RGB %.4f | SSIM %.4f | minimo %.4f</translation>
                 </translations>
               </property>
             </properties>
@@ -476,8 +566,8 @@
               <property>
                 <value>%d x %d</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">%d x %d</translation>
                   <translation language="fr" status="proposed">%d x %d</translation>
+                  <translation language="it-IT" status="proposed">%d x %d</translation>
                 </translations>
               </property>
             </properties>
@@ -487,8 +577,8 @@
               <property>
                 <value>%.0f x %.0f DPI</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">%.0f x %.0f DPI</translation>
                   <translation language="fr" status="proposed">%.0f x %.0f DPI</translation>
+                  <translation language="it-IT" status="proposed">%.0f x %.0f DPI</translation>
                 </translations>
               </property>
             </properties>
@@ -498,8 +588,8 @@
               <property>
                 <value>Excel export created: %s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Esportazione in Excel creata: %s</translation>
                   <translation language="fr" status="proposed">Fichier Excel exporté : %s</translation>
+                  <translation language="it-IT" status="proposed">Esportazione in Excel creata: %s</translation>
                 </translations>
               </property>
             </properties>
@@ -509,8 +599,8 @@
               <property>
                 <value>Unable to export to Excel:%s%s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Impossibile esportare in Excel: %s%s</translation>
                   <translation language="fr" status="proposed">Impossible d'exporter vers Excel : %s%s</translation>
+                  <translation language="it-IT" status="proposed">Impossibile esportare in Excel: %s%s</translation>
                 </translations>
               </property>
             </properties>
@@ -520,8 +610,8 @@
               <property>
                 <value>Unable to show the file in File Explorer (error 0x%.8x).</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Impossibile visualizzare il file in Esplora file (errore 0x%.8x).</translation>
                   <translation language="fr" status="proposed">Impossible d'afficher le fichier dans l'Explorateur de fichiers (erreur 0x%.8x).</translation>
+                  <translation language="it-IT" status="proposed">Impossibile visualizzare il file in Esplora file (errore 0x%.8x).</translation>
                 </translations>
               </property>
             </properties>
@@ -531,8 +621,8 @@
               <property>
                 <value>File is not available.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Il file non è disponibile.</translation>
                   <translation language="fr" status="proposed">Le fichier n'est pas disponible.</translation>
+                  <translation language="it-IT" status="proposed">Il file non è disponibile.</translation>
                 </translations>
               </property>
             </properties>
@@ -542,8 +632,8 @@
               <property>
                 <value>Folder does not exist: %s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">La cartella non esiste: %s</translation>
                   <translation language="fr" status="proposed">Le dossier n'existe pas : %s</translation>
+                  <translation language="it-IT" status="proposed">La cartella non esiste: %s</translation>
                 </translations>
               </property>
             </properties>
@@ -553,8 +643,8 @@
               <property>
                 <value>Add at least one folder.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Aggiungi almeno una cartella.</translation>
                   <translation language="fr" status="proposed">Ajoutez au moins un dossier.</translation>
+                  <translation language="it-IT" status="proposed">Aggiungi almeno una cartella.</translation>
                 </translations>
               </property>
             </properties>
@@ -564,8 +654,8 @@
               <property>
                 <value>Folder-based selection has been applied to the other groups.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">La selezione basata sulle cartelle è stata applicata agli altri gruppi.</translation>
                   <translation language="fr" status="proposed">La sélection par dossiers a été appliquée aux autres groupes.</translation>
+                  <translation language="it-IT" status="proposed">La selezione basata sulle cartelle è stata applicata agli altri gruppi.</translation>
                 </translations>
               </property>
             </properties>
@@ -585,8 +675,8 @@
               <property>
                 <value>Group %d  (%d images)</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Gruppo %d  (%d immagini)</translation>
                   <translation language="fr" status="proposed">Groupe %d  (%d images)</translation>
+                  <translation language="it-IT" status="proposed">Gruppo %d  (%d immagini)</translation>
                 </translations>
               </property>
             </properties>
@@ -596,8 +686,8 @@
               <property>
                 <value>Each group retains at least one unselected file.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Ogni gruppo conserva almeno un file non selezionato.</translation>
                   <translation language="fr" status="proposed">Chaque groupe conserve au moins un fichier non sélectionné.</translation>
+                  <translation language="it-IT" status="proposed">Ogni gruppo conserva almeno un file non selezionato.</translation>
                 </translations>
               </property>
             </properties>
@@ -607,8 +697,8 @@
               <property>
                 <value>Group reference</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Riferimento al gruppo</translation>
                   <translation language="fr" status="proposed">Référence du groupe</translation>
+                  <translation language="it-IT" status="proposed">Riferimento al gruppo</translation>
                 </translations>
               </property>
             </properties>
@@ -618,8 +708,8 @@
               <property>
                 <value>%s - %d groups, %d grouped files.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">%s - %d gruppi, %d file raggruppati.</translation>
                   <translation language="fr" status="proposed">%s - %d groupes, %d fichiers regroupés.</translation>
+                  <translation language="it-IT" status="proposed">%s - %d gruppi, %d file raggruppati.</translation>
                 </translations>
               </property>
             </properties>
@@ -629,8 +719,8 @@
               <property>
                 <value>Similar image groups - add folders and start the search</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Gruppi di immagini simili: aggiungi le cartelle e avvia la ricerca</translation>
                   <translation language="fr" status="proposed">Groupes d'images similaires : ajoutez des dossiers et lancez la recherche</translation>
+                  <translation language="it-IT" status="proposed">Gruppi di immagini simili: aggiungi le cartelle e avvia la ricerca</translation>
                 </translations>
               </property>
             </properties>
@@ -640,8 +730,8 @@
               <property>
                 <value>The saved criteria are invalid.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">I criteri salvati non sono validi.</translation>
                   <translation language="fr" status="proposed">Les critères enregistrés ne sont pas valides.</translation>
+                  <translation language="it-IT" status="proposed">I criteri salvati non sono validi.</translation>
                 </translations>
               </property>
             </properties>
@@ -691,8 +781,8 @@
               <property>
                 <value>Move the %d selected files to "%s" while preserving their folder structure?</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Spostare i %d file selezionati in "%s" mantenendo la loro struttura di cartelle?</translation>
                   <translation language="fr" status="proposed">Déplacer les %d fichiers sélectionnés vers « %s » tout en conservant leur structure de dossiers ?</translation>
+                  <translation language="it-IT" status="proposed">Spostare i %d file selezionati in "%s" mantenendo la loro struttura di cartelle?</translation>
                 </translations>
               </property>
             </properties>
@@ -702,8 +792,8 @@
               <property>
                 <value>%d files could not be moved and remain selected.%sSee Error details for the reasons.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Non è stato possibile spostare %d file, che rimangono selezionati.%sPer i motivi, consultare i dettagli dell'errore.</translation>
                   <translation language="fr" status="proposed">%d fichiers n'ont pas pu être déplacés et restent sélectionnés.%sConsultez les détails de l'erreur pour en connaître les raisons.</translation>
+                  <translation language="it-IT" status="proposed">Non è stato possibile spostare %d file, che rimangono selezionati.%sPer i motivi, consultare i dettagli dell'errore.</translation>
                 </translations>
               </property>
             </properties>
@@ -713,8 +803,8 @@
               <property>
                 <value>Move selected files to a folder</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Sposta i file selezionati in una cartella</translation>
                   <translation language="fr" status="proposed">Déplacer les fichiers sélectionnés vers un dossier</translation>
+                  <translation language="it-IT" status="proposed">Sposta i file selezionati in una cartella</translation>
                 </translations>
               </property>
             </properties>
@@ -724,8 +814,8 @@
               <property>
                 <value>Moved: %d | Not moved: %d</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Spostati: %d | Non spostati: %d</translation>
                   <translation language="fr" status="proposed">Déplacés : %d | Non déplacés : %d</translation>
+                  <translation language="it-IT" status="proposed">Spostati: %d | Non spostati: %d</translation>
                 </translations>
               </property>
             </properties>
@@ -735,8 +825,8 @@
               <property>
                 <value>Moving to folder: %s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Spostamento nella cartella: %s</translation>
                   <translation language="fr" status="proposed">Déplacement vers le dossier : %s</translation>
+                  <translation language="it-IT" status="proposed">Spostamento nella cartella: %s</translation>
                 </translations>
               </property>
             </properties>
@@ -746,8 +836,8 @@
               <property>
                 <value>Moving to the Recycle Bin: %s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Spostamento nel Cestino: %s</translation>
                   <translation language="fr" status="proposed">Déplacement vers la corbeille : %s</translation>
+                  <translation language="it-IT" status="proposed">Spostamento nel Cestino: %s</translation>
                 </translations>
               </property>
             </properties>
@@ -757,8 +847,8 @@
               <property>
                 <value>no</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">no</translation>
                   <translation language="fr" status="proposed">non</translation>
+                  <translation language="it-IT" status="proposed">no</translation>
                 </translations>
               </property>
             </properties>
@@ -768,8 +858,8 @@
               <property>
                 <value>%s - no groups found</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">%s - nessun gruppo trovato</translation>
                   <translation language="fr" status="proposed">%s - aucun groupe trouvé</translation>
+                  <translation language="it-IT" status="proposed">%s - nessun gruppo trovato</translation>
                 </translations>
               </property>
             </properties>
@@ -779,8 +869,8 @@
               <property>
                 <value>Search options updated.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Opzioni di ricerca aggiornate.</translation>
                   <translation language="fr" status="proposed">Mise à jour des options de recherche.</translation>
+                  <translation language="it-IT" status="proposed">Opzioni di ricerca aggiornate.</translation>
                 </translations>
               </property>
             </properties>
@@ -790,8 +880,8 @@
               <property>
                 <value>%s%s%s px | %s | %s | %s%sQuality %.1f/100 | sharpness %.3f | noise %.3f | artifacts %.3f%s%s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">%s%s%s px | %s | %s | %s%sQualità %.1f/100 | nitidezza %.3f | rumore %.3f | artefatti %.3f%s%s</translation>
                   <translation language="fr" status="proposed">%s%s%s px | %s | %s | %s%sQualité %.1f/100 | netteté %.3f | bruit %.3f | artefacts %.3f%s%s</translation>
+                  <translation language="it-IT" status="proposed">%s%s%s px | %s | %s | %s%sQualità %.1f/100 | nitidezza %.3f | rumore %.3f | artefatti %.3f%s%s</translation>
                 </translations>
               </property>
             </properties>
@@ -801,8 +891,8 @@
               <property>
                 <value>Preview unavailable</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Anteprima non disponibile</translation>
                   <translation language="fr" status="proposed">Aperçu indisponible</translation>
+                  <translation language="it-IT" status="proposed">Anteprima non disponibile</translation>
                 </translations>
               </property>
             </properties>
@@ -812,8 +902,8 @@
               <property>
                 <value>%d / %d images</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">%d / %d immagini</translation>
                   <translation language="fr" status="proposed">%d / %d images</translation>
+                  <translation language="it-IT" status="proposed">%d / %d immagini</translation>
                 </translations>
               </property>
             </properties>
@@ -823,8 +913,8 @@
               <property>
                 <value>Quality: %.1f/100%sSharpness: %.3f | noise: %.3f | artifacts: %.3f%sClipping: %.3f | banding: %.3f | upscaling risk: %.3f%sBit depth: %d bits/channel | ICC profile: %s | chroma: %s | color mode: %s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Qualità: %.1f/100%sNitidezza: %.3f | rumore: %.3f | artefatti: %.3f%sClipping: %.3f | banding: %.3f | rischio di upscaling: %.3f%sProfondità bit: %d bit/canale | profilo ICC: %s | crominanza: %s | modalità colore: %s</translation>
                   <translation language="fr" status="proposed">Qualité : %.1f/100%sNetteté : %.3f | bruit : %.3f | artefacts : %.3f%sÉclatement : %.3f | bandes : %.3f | risque d'upscaling : %.3f%sProfondeur de bits : %d bits/canal | profil ICC : %s | chrominance : %s | mode couleur : %s</translation>
+                  <translation language="it-IT" status="proposed">Qualità: %.1f/100%sNitidezza: %.3f | rumore: %.3f | artefatti: %.3f%sClipping: %.3f | banding: %.3f | rischio di upscaling: %.3f%sProfondità bit: %d bit/canale | profilo ICC: %s | crominanza: %s | modalità colore: %s</translation>
                 </translations>
               </property>
             </properties>
@@ -834,8 +924,8 @@
               <property>
                 <value>Read errors (first 200)</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Errori di lettura (i primi 200)</translation>
                   <translation language="fr" status="proposed">Erreurs de lecture (les 200 premières)</translation>
+                  <translation language="it-IT" status="proposed">Errori di lettura (i primi 200)</translation>
                 </translations>
               </property>
             </properties>
@@ -845,8 +935,8 @@
               <property>
                 <value>Ready</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Pronto</translation>
                   <translation language="fr" status="proposed">Prêt</translation>
+                  <translation language="it-IT" status="proposed">Pronto</translation>
                 </translations>
               </property>
             </properties>
@@ -856,8 +946,8 @@
               <property>
                 <value>Move the %d selected files to the Windows Recycle Bin?</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Spostare i %d file selezionati nel Cestino di Windows?</translation>
                   <translation language="fr" status="proposed">Voulez-vous déplacer les %d fichiers sélectionnés vers la corbeille de Windows ?</translation>
+                  <translation language="it-IT" status="proposed">Spostare i %d file selezionati nel Cestino di Windows?</translation>
                 </translations>
               </property>
             </properties>
@@ -867,8 +957,8 @@
               <property>
                 <value>%d files could not be moved and remain selected.%sSee Error details for the reasons.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Non è stato possibile spostare %d file, che rimangono selezionati.%sPer i motivi, consultare i dettagli dell'errore.</translation>
                   <translation language="fr" status="proposed">%d fichiers n'ont pas pu être déplacés et restent sélectionnés.%sConsultez les détails de l'erreur pour en connaître les raisons.</translation>
+                  <translation language="it-IT" status="proposed">Non è stato possibile spostare %d file, che rimangono selezionati.%sPer i motivi, consultare i dettagli dell'errore.</translation>
                 </translations>
               </property>
             </properties>
@@ -878,8 +968,8 @@
               <property>
                 <value>In the Recycle Bin: %d | Not moved: %d</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Nel Cestino: %d | Non spostati: %d</translation>
                   <translation language="fr" status="proposed">Dans la corbeille : %d | Non déplacés : %d</translation>
+                  <translation language="it-IT" status="proposed">Nel Cestino: %d | Non spostati: %d</translation>
                 </translations>
               </property>
             </properties>
@@ -889,8 +979,8 @@
               <property>
                 <value>Reference file set: %s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Set di file di riferimento: %s</translation>
                   <translation language="fr" status="proposed">Ensemble de fichiers de référence : %s</translation>
+                  <translation language="it-IT" status="proposed">Set di file di riferimento: %s</translation>
                 </translations>
               </property>
             </properties>
@@ -900,8 +990,8 @@
               <property>
                 <value>The reference file has been updated in every group.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Il file di riferimento è stato aggiornato in ogni gruppo.</translation>
                   <translation language="fr" status="proposed">Le fichier de référence a été mis à jour dans chaque groupe.</translation>
+                  <translation language="it-IT" status="proposed">Il file di riferimento è stato aggiornato in ogni gruppo.</translation>
                 </translations>
               </property>
             </properties>
@@ -1071,8 +1161,8 @@
               <property>
                 <value>Unable to load the session:%s%s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Impossibile caricare la sessione: %s%s</translation>
                   <translation language="fr" status="proposed">Impossible de charger la session : %s%s</translation>
+                  <translation language="it-IT" status="proposed">Impossibile caricare la sessione: %s%s</translation>
                 </translations>
               </property>
             </properties>
@@ -1092,8 +1182,8 @@
               <property>
                 <value>Unable to save the session:%s%s</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Impossibile salvare la sessione: %s%s</translation>
                   <translation language="fr" status="proposed">Impossible d'enregistrer la session : %s%s</translation>
+                  <translation language="it-IT" status="proposed">Impossibile salvare la sessione: %s%s</translation>
                 </translations>
               </property>
             </properties>
@@ -1163,8 +1253,8 @@
               <property>
                 <value>yes</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">sì</translation>
                   <translation language="fr" status="proposed">oui</translation>
+                  <translation language="it-IT" status="proposed">sì</translation>
                 </translations>
               </property>
             </properties>
@@ -1184,8 +1274,8 @@
               <property>
                 <value>File is not available.</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Il file non è disponibile.</translation>
                   <translation language="fr" status="proposed">Le fichier n'est pas disponible.</translation>
+                  <translation language="it-IT" status="proposed">Il file non è disponibile.</translation>
                 </translations>
               </property>
             </properties>
@@ -1336,6 +1426,16 @@
                 <value>Missing value: %s</value>
                 <translations>
                   <translation language="it-IT" status="proposed">Valore mancante: %s</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
+          <item name="ImageDup_Settings_rsStyleSettingsUnavailable">
+            <properties>
+              <property>
+                <value>Unable to open the GUI style settings for writing.</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Impossibile aprire le impostazioni dello stile dell'interfaccia grafica in modalità di scrittura.</translation>
                 </translations>
               </property>
             </properties>
@@ -3482,8 +3582,8 @@
               <property>
                 <value>Friday</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Venerdì</translation>
                   <translation language="fr" status="proposed">Vendredi</translation>
+                  <translation language="it-IT" status="proposed">Venerdì</translation>
                 </translations>
               </property>
             </properties>
@@ -3493,8 +3593,8 @@
               <property>
                 <value>Monday</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Lunedì</translation>
                   <translation language="fr" status="proposed">lundi</translation>
+                  <translation language="it-IT" status="proposed">Lunedì</translation>
                 </translations>
               </property>
             </properties>
@@ -3504,8 +3604,8 @@
               <property>
                 <value>Saturday</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Sabato</translation>
                   <translation language="fr" status="proposed">samedi</translation>
+                  <translation language="it-IT" status="proposed">Sabato</translation>
                 </translations>
               </property>
             </properties>
@@ -3515,8 +3615,8 @@
               <property>
                 <value>Sunday</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Domenica</translation>
                   <translation language="fr" status="proposed">dimanche</translation>
+                  <translation language="it-IT" status="proposed">Domenica</translation>
                 </translations>
               </property>
             </properties>
@@ -3526,8 +3626,8 @@
               <property>
                 <value>Thursday</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Giovedì</translation>
                   <translation language="fr" status="proposed">jeudi</translation>
+                  <translation language="it-IT" status="proposed">Giovedì</translation>
                 </translations>
               </property>
             </properties>
@@ -3537,8 +3637,8 @@
               <property>
                 <value>Tuesday</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">martedì</translation>
                   <translation language="fr" status="proposed">mardi</translation>
+                  <translation language="it-IT" status="proposed">martedì</translation>
                 </translations>
               </property>
             </properties>
@@ -3548,8 +3648,8 @@
               <property>
                 <value>Wednesday</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">mercoledì</translation>
                   <translation language="fr" status="proposed">mercredi</translation>
+                  <translation language="it-IT" status="proposed">mercoledì</translation>
                 </translations>
               </property>
             </properties>
@@ -3559,8 +3659,8 @@
               <property>
                 <value>April</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">aprile</translation>
                   <translation language="fr" status="proposed">avril</translation>
+                  <translation language="it-IT" status="proposed">aprile</translation>
                 </translations>
               </property>
             </properties>
@@ -3570,8 +3670,8 @@
               <property>
                 <value>August</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">agosto</translation>
                   <translation language="fr" status="proposed">août</translation>
+                  <translation language="it-IT" status="proposed">agosto</translation>
                 </translations>
               </property>
             </properties>
@@ -3581,8 +3681,8 @@
               <property>
                 <value>December</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">dicembre</translation>
                   <translation language="fr" status="proposed">décembre</translation>
+                  <translation language="it-IT" status="proposed">dicembre</translation>
                 </translations>
               </property>
             </properties>
@@ -3592,8 +3692,8 @@
               <property>
                 <value>February</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">febbraio</translation>
                   <translation language="fr" status="proposed">février</translation>
+                  <translation language="it-IT" status="proposed">febbraio</translation>
                 </translations>
               </property>
             </properties>
@@ -3603,8 +3703,8 @@
               <property>
                 <value>January</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">gennaio</translation>
                   <translation language="fr" status="proposed">janvier</translation>
+                  <translation language="it-IT" status="proposed">gennaio</translation>
                 </translations>
               </property>
             </properties>
@@ -3614,8 +3714,8 @@
               <property>
                 <value>July</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">luglio</translation>
                   <translation language="fr" status="proposed">juillet</translation>
+                  <translation language="it-IT" status="proposed">luglio</translation>
                 </translations>
               </property>
             </properties>
@@ -3625,8 +3725,8 @@
               <property>
                 <value>June</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">giugno</translation>
                   <translation language="fr" status="proposed">juin</translation>
+                  <translation language="it-IT" status="proposed">giugno</translation>
                 </translations>
               </property>
             </properties>
@@ -3636,8 +3736,8 @@
               <property>
                 <value>March</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">marzo</translation>
                   <translation language="fr" status="proposed">mars</translation>
+                  <translation language="it-IT" status="proposed">marzo</translation>
                 </translations>
               </property>
             </properties>
@@ -3647,8 +3747,8 @@
               <property>
                 <value>May</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">maggio</translation>
                   <translation language="fr" status="proposed">mai</translation>
+                  <translation language="it-IT" status="proposed">maggio</translation>
                 </translations>
               </property>
             </properties>
@@ -3658,8 +3758,8 @@
               <property>
                 <value>November</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">novembre</translation>
                   <translation language="fr" status="proposed">novembre</translation>
+                  <translation language="it-IT" status="proposed">novembre</translation>
                 </translations>
               </property>
             </properties>
@@ -3669,8 +3769,8 @@
               <property>
                 <value>October</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">ottobre</translation>
                   <translation language="fr" status="proposed">octobre</translation>
+                  <translation language="it-IT" status="proposed">ottobre</translation>
                 </translations>
               </property>
             </properties>
@@ -3680,8 +3780,8 @@
               <property>
                 <value>September</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">settembre</translation>
                   <translation language="fr" status="proposed">septembre</translation>
+                  <translation language="it-IT" status="proposed">settembre</translation>
                 </translations>
               </property>
             </properties>
@@ -3831,8 +3931,8 @@
               <property>
                 <value>Fri</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Ven</translation>
                   <translation language="fr" status="proposed">Vendredi</translation>
+                  <translation language="it-IT" status="proposed">Ven</translation>
                 </translations>
               </property>
             </properties>
@@ -3842,8 +3942,8 @@
               <property>
                 <value>Mon</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Lun</translation>
                   <translation language="fr" status="proposed">lundi</translation>
+                  <translation language="it-IT" status="proposed">Lun</translation>
                 </translations>
               </property>
             </properties>
@@ -3853,8 +3953,8 @@
               <property>
                 <value>Sat</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Sab</translation>
                   <translation language="fr" status="proposed">samedi</translation>
+                  <translation language="it-IT" status="proposed">Sab</translation>
                 </translations>
               </property>
             </properties>
@@ -3864,8 +3964,8 @@
               <property>
                 <value>Sun</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Dom</translation>
                   <translation language="fr" status="proposed">Dimanche</translation>
+                  <translation language="it-IT" status="proposed">Dom</translation>
                 </translations>
               </property>
             </properties>
@@ -3875,8 +3975,8 @@
               <property>
                 <value>Thu</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Gio</translation>
                   <translation language="fr" status="proposed">jeu.</translation>
+                  <translation language="it-IT" status="proposed">Gio</translation>
                 </translations>
               </property>
             </properties>
@@ -3886,8 +3986,8 @@
               <property>
                 <value>Tue</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Mar</translation>
                   <translation language="fr" status="proposed">mardi</translation>
+                  <translation language="it-IT" status="proposed">Mar</translation>
                 </translations>
               </property>
             </properties>
@@ -3897,8 +3997,8 @@
               <property>
                 <value>Wed</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Mer</translation>
                   <translation language="fr" status="proposed">mercredi</translation>
+                  <translation language="it-IT" status="proposed">Mer</translation>
                 </translations>
               </property>
             </properties>
@@ -3908,8 +4008,8 @@
               <property>
                 <value>Apr</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Apr</translation>
                   <translation language="fr" status="proposed">avril</translation>
+                  <translation language="it-IT" status="proposed">Apr</translation>
                 </translations>
               </property>
             </properties>
@@ -3919,8 +4019,8 @@
               <property>
                 <value>Aug</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Aug</translation>
                   <translation language="fr" status="proposed">août</translation>
+                  <translation language="it-IT" status="proposed">Aug</translation>
                 </translations>
               </property>
             </properties>
@@ -3930,8 +4030,8 @@
               <property>
                 <value>Dec</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Dic</translation>
                   <translation language="fr" status="proposed">déc.</translation>
+                  <translation language="it-IT" status="proposed">Dic</translation>
                 </translations>
               </property>
             </properties>
@@ -3941,8 +4041,8 @@
               <property>
                 <value>Feb</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Feb</translation>
                   <translation language="fr" status="proposed">févr.</translation>
+                  <translation language="it-IT" status="proposed">Feb</translation>
                 </translations>
               </property>
             </properties>
@@ -3952,8 +4052,8 @@
               <property>
                 <value>Jan</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Gen</translation>
                   <translation language="fr" status="proposed">Janvier</translation>
+                  <translation language="it-IT" status="proposed">Gen</translation>
                 </translations>
               </property>
             </properties>
@@ -3963,8 +4063,8 @@
               <property>
                 <value>Jul</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Lug</translation>
                   <translation language="fr" status="proposed">juillet</translation>
+                  <translation language="it-IT" status="proposed">Lug</translation>
                 </translations>
               </property>
             </properties>
@@ -3974,8 +4074,8 @@
               <property>
                 <value>Jun</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Giu</translation>
                   <translation language="fr" status="proposed">juin</translation>
+                  <translation language="it-IT" status="proposed">Giu</translation>
                 </translations>
               </property>
             </properties>
@@ -3985,8 +4085,8 @@
               <property>
                 <value>Mar</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Mar</translation>
                   <translation language="fr" status="proposed">mars</translation>
+                  <translation language="it-IT" status="proposed">Mar</translation>
                 </translations>
               </property>
             </properties>
@@ -3996,8 +4096,8 @@
               <property>
                 <value>May</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">May</translation>
                   <translation language="fr" status="proposed">mai</translation>
+                  <translation language="it-IT" status="proposed">May</translation>
                 </translations>
               </property>
             </properties>
@@ -4007,8 +4107,8 @@
               <property>
                 <value>Nov</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Nov</translation>
                   <translation language="fr" status="proposed">nov.</translation>
+                  <translation language="it-IT" status="proposed">Nov</translation>
                 </translations>
               </property>
             </properties>
@@ -4018,8 +4118,8 @@
               <property>
                 <value>Oct</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Ott</translation>
                   <translation language="fr" status="proposed">oct.</translation>
+                  <translation language="it-IT" status="proposed">Ott</translation>
                 </translations>
               </property>
             </properties>
@@ -4029,8 +4129,8 @@
               <property>
                 <value>Sep</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Set</translation>
                   <translation language="fr" status="proposed">sept.</translation>
+                  <translation language="it-IT" status="proposed">Set</translation>
                 </translations>
               </property>
             </properties>
@@ -5861,7 +5961,7 @@
               </property>
             </properties>
           </item>
-          <item name="Vcl_Imaging_JConsts_sChangeJPGSize">
+          <item name="Vcl_Imaging_JConsts_sChangeJPGSize" state="unused">
             <properties>
               <property>
                 <value>Cannot change the size of a JPEG image</value>
@@ -5871,7 +5971,7 @@
               </property>
             </properties>
           </item>
-          <item name="Vcl_Imaging_JConsts_sJPEGError">
+          <item name="Vcl_Imaging_JConsts_sJPEGError" state="unused">
             <properties>
               <property>
                 <value>JPEG error #%d</value>
@@ -5881,7 +5981,7 @@
               </property>
             </properties>
           </item>
-          <item name="Vcl_Imaging_JConsts_sJPEGImageFile">
+          <item name="Vcl_Imaging_JConsts_sJPEGImageFile" state="unused">
             <properties>
               <property>
                 <value>JPEG Image File</value>
@@ -8393,6 +8493,16 @@
               </property>
             </properties>
           </item>
+          <item name="FormMain.TitleBarPanel.StyleComboBox" type="TComboBox">
+            <properties>
+              <property name="Hint">
+                <value>Change the application style</value>
+                <translations>
+                  <translation language="it-IT" status="proposed">Modifica lo stile dell'applicazione</translation>
+                </translations>
+              </property>
+            </properties>
+          </item>
           <item name="FormMain.VirtualImageList16.Images[0]" type="TVirtualImageList" state="unused">
             <properties>
               <property name="CollectionName" status="skip">
@@ -10047,8 +10157,8 @@
               <property name="Title">
                 <value>Move selected files to a folder</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Sposta i file selezionati in una cartella</translation>
                   <translation language="fr" status="proposed">Déplacer les fichiers sélectionnés vers un dossier</translation>
+                  <translation language="it-IT" status="proposed">Sposta i file selezionati in una cartella</translation>
                 </translations>
               </property>
             </properties>
@@ -10104,8 +10214,8 @@
               <property name="Caption">
                 <value>Similar image groups - add folders and start the search</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Gruppi di immagini simili: aggiungi le cartelle e avvia la ricerca</translation>
                   <translation language="fr" status="proposed">Groupes d'images similaires : ajoutez des dossiers et lancez la recherche</translation>
+                  <translation language="it-IT" status="proposed">Gruppi di immagini simili: aggiungi le cartelle e avvia la ricerca</translation>
                 </translations>
               </property>
             </properties>
@@ -10135,8 +10245,8 @@
               <property name="Text">
                 <value>Pixels</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Pixels</translation>
                   <translation language="fr" status="proposed">Pixels</translation>
+                  <translation language="it-IT" status="proposed">Pixels</translation>
                 </translations>
               </property>
             </properties>
@@ -10146,8 +10256,8 @@
               <property name="Text">
                 <value>Bytes</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Bytes</translation>
                   <translation language="fr" status="proposed">Octets</translation>
+                  <translation language="it-IT" status="proposed">Bytes</translation>
                 </translations>
               </property>
             </properties>
@@ -10157,8 +10267,8 @@
               <property name="Text">
                 <value>Date and time</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Data e ora</translation>
                   <translation language="fr" status="proposed">Date et heure</translation>
+                  <translation language="it-IT" status="proposed">Data e ora</translation>
                 </translations>
               </property>
             </properties>
@@ -10168,8 +10278,8 @@
               <property name="Text">
                 <value>Quality</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Qualità</translation>
                   <translation language="fr" status="proposed">Qualité</translation>
+                  <translation language="it-IT" status="proposed">Qualità</translation>
                 </translations>
               </property>
             </properties>
@@ -10275,8 +10385,8 @@
               <property name="Text">
                 <value>Ready</value>
                 <translations>
-                  <translation language="it-IT" status="proposed">Pronto</translation>
                   <translation language="fr" status="proposed">Prêt</translation>
+                  <translation language="it-IT" status="proposed">Pronto</translation>
                 </translations>
               </property>
             </properties>
