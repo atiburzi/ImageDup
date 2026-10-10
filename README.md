@@ -295,7 +295,10 @@ These functions obey:
 
 $$
 \sum_{n=0}^{N-1}\phi_k(n)\phi_j(n)=
-\begin{cases}1 & k=j\\0 & k\ne j.\end{cases}
+\begin{cases}
+1, & k=j, \\
+0, & k\ne j.
+\end{cases}
 $$
 
 The transform projects the signal onto independent directions. If all coefficients are retained, the signal can be reconstructed:
@@ -404,7 +407,11 @@ The 63 coefficients are copied, sorted, and compared with the middle element, in
 
 $$
 m=\mathrm{median}(c_0,\ldots,c_{62}),\qquad
-b_i=\begin{cases}1 & c_i>m\\0 & c_i\le m.\end{cases}
+b_i=
+\begin{cases}
+1, & c_i>m, \\
+0, & c_i\le m.
+\end{cases}
 $$
 
 $$
