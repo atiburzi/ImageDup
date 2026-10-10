@@ -51,55 +51,80 @@ The Delphi project is in [`Source/`](Source/); translations, icons, and artwork 
 
 ## Features and usage
 
-### Quick start
+ImageDup turns a crowded photo archive into a set of clear, reviewable decisions. It looks at the image itself rather than relying on filenames, dimensions, dates, or file size, so a resized copy or a recompressed JPEG can still be associated with its visual relatives.
 
-1. Open a new session from the main window.
-2. Add one or more folders. The picker supports multiple selections; each path occupies one line.
-3. Open **Options** and choose the scan settings.
-4. Click **Start search**.
-5. Inspect the groups in the tree and compare their previews.
-6. Choose a reference image, apply a selection rule, and review the checkboxes.
-7. Save the session, export it to Excel, or perform an operation on the selected files.
+The workflow is designed to answer three practical questions:
 
-A search can start only when at least one folder is specified. Paths are checked when scanning starts. Commands are enabled according to the session state.
+1. **Which files show the same or sufficiently similar image?**
+2. **Which version is the strongest candidate to keep?**
+3. **What should happen to the remaining copies?**
 
-### Per-session options
+Scanning and analysis run locally on the Windows PC. Results remain under the user's control: finding a match never deletes or moves a file, and every automatic selection remains visible for review before a file operation is started.
 
-| Option | Range / initial value | Effect |
+### What ImageDup brings to an image collection
+
+| Capability | Benefit |
+|---|---|
+| **Content-aware matching** | Finds visually related images even when their names, dimensions, metadata, or compression differ. |
+| **Duplicate groups instead of isolated pairs** | Presents every compatible version together, making large collections easier to understand. |
+| **Quality-guided ranking** | Evaluates resolution, effective sharpness, artifacts, noise, tonal information, color mode, bit depth, ICC metadata, and other signals to help identify the best reference. |
+| **Side-by-side visual review** | Builds a responsive preview gallery for the selected group and exposes the comparison details needed to make the final call. |
+| **Flexible reference rules** | Can nominate a reference by quality, resolution, file size, or date, in either direction, or accept a file chosen directly by the user. |
+| **Controlled batch selection** | Selects files relative to the reference or by folder relationship, while keeping checkboxes visible and ensuring that a group can retain at least one file. |
+| **Safer cleanup choices** | Sends selected files to the Windows Recycle Bin or moves them to another folder while preserving their directory structure. |
+| **Reusable work sessions** | Saves criteria, groups, references, and selections in an `.idup` document, then restores them without repeating the scan. |
+| **Multiple independent sessions** | Uses an MDI workspace so different archives, criteria, and result sets can stay open at the same time. |
+| **Portable reporting** | Exports the result tree to `.xlsx` without requiring Microsoft Excel. |
+
+ImageDup is useful for consolidating photo archives, cleaning folders collected from several devices, comparing edited and exported versions, reviewing scans saved at different resolutions, or auditing a collection before it is archived or moved.
+
+### From folders to a reviewed result
+
+1. Choose **New session** in the main window.
+2. Add one or more folders. The modern folder picker supports multiple selections, and every selected path is shown explicitly in the session.
+3. Open **Options** to balance matching strictness and processing resources for that collection.
+4. Select **Start search**. ImageDup enumerates the supported files, decodes and analyzes them on worker threads, and adds groups to the tree as results become available.
+5. Select a group to compare all of its members in the adaptive preview area.
+6. Confirm or change the reference, then apply a selection rule and inspect the resulting checkboxes.
+7. Save the `.idup` session, export an Excel report, move the selected files, or send them to the Recycle Bin.
+
+A search becomes available after at least one folder is specified. Paths are validated when scanning starts, and commands are enabled only when they make sense for the current session state.
+
+### Tune each session
+
+Every session keeps its own scan criteria, allowing a strict archival review and a broader discovery scan to coexist in the same application.
+
+| Option | Range / initial value | Practical effect |
 |---|---|---|
-| Matching quality index | 0–10; initially 8 | Controls the maximum distance between DCT hashes. Higher values are more restrictive. |
-| Number of threads | 1–64; initially 3 | Number of workers decoding and analyzing images. |
-| Include subfolders | Initially enabled | Searches subfolders. |
-| Include groups without duplicates | Initially disabled | Also displays groups containing one file. |
+| Matching quality index | 0–10; initially 8 | Controls the maximum distance between DCT hashes. Higher values demand a closer perceptual match; lower values explore broader similarities. |
+| Number of threads | 1–64; initially 3 | Sets the number of workers decoding and analyzing images. The best value depends on storage speed, processor capacity, and the number of concurrent sessions. |
+| Include subfolders | Initially enabled | Extends the scan through the complete directory tree below every selected root. |
+| Include groups without duplicates | Initially disabled | Also shows single-file groups, useful when the session is being used as a collection inventory. |
 
-Changed options take effect on the next scan; they do not automatically rebuild the results already shown.
+Changed options take effect on the next scan; they do not silently rebuild results that are already being reviewed. The matching quality index controls the DCT distance threshold, while additional RGB and structural checks continue to protect against weak hash-only matches.
 
-### Results and previews
+### Review groups with the evidence in view
 
-The tree displays groups and files, checkboxes, pixel dimensions, file size, modification date/time, and technical quality. Icons distinguish the reference, members classified as identical to it, and members classified as different.
+The result tree keeps the essential facts beside each file: selection state, full path, pixel dimensions, file size, modification date and time, and technical quality score. Relationship icons immediately distinguish the group reference, files classified as identical to that reference, and visually similar files that still differ from it.
 
-- Members are initially ordered by descending quality.
-- Clicking the **File / group** header alternates group ordering by member count.
-- Other headers order files within each group.
-- **Shift + mouse wheel** moves between groups.
-- Previews are arranged and resized according to the member count and available area.
-- The session status bar shows progress, counts, and the number and total size of checked files.
-- The progress bar is meaningful during a scan; until enumeration determines the total, progress is not yet determinate.
+- Members start in descending quality order, placing the strongest reference candidate first.
+- Clicking **File / group** alternates the order of all groups by member count.
+- Clicking another column sorts the members inside each group by that property.
+- **Shift + mouse wheel** moves directly between groups during a review.
+- The preview gallery automatically chooses a layout and image size suited to the number of members and the available window area.
+- Each preview includes dimensions, storage size, DPI information, timestamp, quality, and relevant comparison metrics.
+- The status bar reports scan progress, totals, errors, and both the number and combined size of selected files.
+- Read failures are collected separately, allowing the scan to continue while preserving useful diagnostics.
 
-### Enlarged viewing
+Reference and selection commands cover both fast cleanup and careful curation. A reference can be chosen by highest or lowest quality, resolution, file size, or date. Selection rules can mark every member except the reference, only members identical to it, or only members that differ. Folder-aware rules can also target matching paths across other groups.
 
-Clicking a preview opens the viewer on the session's monitor:
+### Inspect detail at native size
 
-- if the image fits on the screen, it appears at its native dimensions;
-- if it is larger, it initially fits within the screen;
-- another click switches to native dimensions, after which dragging reveals areas outside the screen;
-- a magnifying-glass cursor indicates that native dimensions are available;
-- right click, Esc, or a click outside the image closes the viewer;
-- clicking the image at native dimensions closes it; dragging is not treated as a click.
+Clicking a preview opens a focused viewer on the session's monitor. If the image fits, it is displayed immediately at its native pixel dimensions. A larger image initially fits within the screen; a second click switches to native size, where dragging reveals portions outside the viewport. The magnifying-glass cursor shows when that closer view is available.
 
-Double-clicking a file row opens the same viewer. Clicking a preview while it is open closes the current viewer.
+Right click, **Esc**, or a click outside the image closes the viewer. Clicking an image already shown at native size closes it as well, while a drag is correctly treated as navigation rather than a closing click. Double-clicking a file row opens the same viewer.
 
-The context menu on a file row or preview can set that file as the reference, select it in File Explorer, apply folder-based selection rules, or open a new session with the image's folder already entered. Creating that session does not start a scan automatically.
+The context menu keeps related actions close to the image being reviewed: set it as the reference, reveal it in Windows File Explorer, apply folder-based selections, or create a new session rooted in its folder. The new session is prepared for inspection but does not start scanning without an explicit command.
 
 ## Formats and decoding
 
