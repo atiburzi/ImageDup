@@ -403,7 +403,7 @@ Discarding DC reduces the hash's sensitivity to average brightness. The entire c
 The 63 coefficients are copied, sorted, and compared with the middle element, index 31:
 
 $$
-m=\operatorname{median}(c_0,\ldots,c_{62}),\qquad
+m=\mathrm{median}(c_0,\ldots,c_{62}),\qquad
 b_i=\begin{cases}1 & c_i>m\\0 & c_i\le m.\end{cases}
 $$
 
@@ -420,7 +420,7 @@ With all coefficients distinct, exactly 31 bits are one. Ties at the median can 
 ### Hamming distance
 
 $$
-d_H(h_A,h_B)=\operatorname{popcount}(h_A\oplus h_B).
+d_H(h_A,h_B)=\mathrm{popcount}(h_A\oplus h_B).
 $$
 
 An illustrative eight-bit example:
@@ -598,7 +598,7 @@ These weights are in the code and cannot currently be changed in the Options dia
 ### Formula
 
 $$
-Q=\operatorname{clamp}(0.85Q_{\mathrm{base}}+15f_{\mathrm{color}},0,100)
+Q=\mathrm{clamp}(0.85Q_{\mathrm{base}}+15f_{\mathrm{color}},0,100)
 $$
 
 $$
