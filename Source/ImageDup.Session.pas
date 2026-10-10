@@ -11,7 +11,6 @@ type
     IncludeSingletons: Boolean;
     Quality: Integer;
     PixelError: Double;
-    ThreadCount: Integer;
     ScannedFiles: Integer;
     Groups: TArray<TImageGroup>;
     SelectedFiles: TArray<string>;
@@ -134,7 +133,6 @@ begin
     Criteria.AddPair('includeSingletons', TJSONBool.Create(State.IncludeSingletons));
     Criteria.AddPair('quality', TJSONNumber.Create(State.Quality));
     Criteria.AddPair('pixelError', TJSONNumber.Create(State.PixelError));
-    Criteria.AddPair('threadCount', TJSONNumber.Create(State.ThreadCount));
     Selected := TJSONArray.Create;
     Root.AddPair('selectedFiles', Selected);
     for S in State.SelectedFiles do Selected.Add(S);
@@ -218,7 +216,6 @@ begin
       Result.Quality := DistanceToComparisonQuality(
         IntValue(Criteria, 'distance'));
     Result.PixelError := FloatValue(Criteria, 'pixelError');
-    Result.ThreadCount := OptionalIntValue(Criteria, 'threadCount', 3);
     Selected := RequireArray(Root, 'selectedFiles');
     SetLength(Result.SelectedFiles, Selected.Count);
     for I := 0 to Selected.Count - 1 do Result.SelectedFiles[I] := Selected.Items[I].Value;

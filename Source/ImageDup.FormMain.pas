@@ -5,21 +5,15 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Forms, Vcl.Controls, Vcl.Dialogs, Vcl.ComCtrls, Vcl.ActnList,
   System.Actions, System.UITypes, Vcl.Menus, Vcl.FormTabsBar,
-  Vcl.StdCtrls, Vcl.Themes, Vcl.TitleBarCtrls, Vcl.ToolWin;
+  Vcl.Themes, Vcl.TitleBarCtrls, Vcl.ToolWin;
 
 const
-  WM_UPDATE_HEADER = WM_APP + $120;
+  WM_REFRESH_HEADER = WM_APP + $120;
+  WM_REFRESH_RECENT_FILES = WM_APP + $121;
 
 type
   TFormMain = class(TForm)
-    ToolBar: TToolBar;
     MenuBar: TToolBar;
-    ToolButtonNew: TToolButton;
-    ToolButtonLoad: TToolButton;
-    ToolButtonSave: TToolButton;
-    ToolButtonFileSeparator: TToolButton;
-    ToolButtonAbout: TToolButton;
-    StyleComboBox: TComboBox;
     TitleBarPanel: TTitleBarPanel;
     FormTabsBar: TFormTabsBar;
     ActionList: TActionList;
@@ -33,6 +27,7 @@ type
     ActionTileHorizontal: TAction;
     ActionTileVertical: TAction;
     ActionArrangeIcons: TAction;
+    ActionSettings: TAction;
     ActionAbout: TAction;
     OpenSessionDialog: TFileOpenDialog;
     SaveSessionDialog: TFileSaveDialog;
@@ -43,18 +38,25 @@ type
     SaveSessionMenuItem: TMenuItem;
     SaveSessionAsMenuItem: TMenuItem;
     CloseSessionMenuItem: TMenuItem;
+    RecentSessionsSeparatorMenuItem: TMenuItem;
+    RecentSession1MenuItem: TMenuItem;
+    RecentSession2MenuItem: TMenuItem;
+    RecentSession3MenuItem: TMenuItem;
+    RecentSession4MenuItem: TMenuItem;
+    RecentSession5MenuItem: TMenuItem;
     FileSeparatorMenuItem: TMenuItem;
     ExitMenuItem: TMenuItem;
     WindowMenu: TMenuItem;
     CascadeMenuItem: TMenuItem;
     TileHorizontalMenuItem: TMenuItem;
     TileVerticalMenuItem: TMenuItem;
+    ToolsMenu: TMenuItem;
+    SettingsMenuItem: TMenuItem;
     HelpMenu: TMenuItem;
     AboutMenuItem: TMenuItem;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure FormResize(Sender: TObject);
-    procedure StyleComboBoxChange(Sender: TObject);
     procedure ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
     procedure ActionNewSessionExecute(Sender: TObject);
     procedure ActionLoadSessionExecute(Sender: TObject);
@@ -66,25 +68,31 @@ type
     procedure ActionTileHorizontalExecute(Sender: TObject);
     procedure ActionTileVerticalExecute(Sender: TObject);
     procedure ActionArrangeIconsExecute(Sender: TObject);
+    procedure ActionSettingsExecute(Sender: TObject);
     procedure ActionAboutExecute(Sender: TObject);
   private
     FNextSessionNumber: Integer;
+    FRecentSessionFiles: TStringList;
     FStartupProcessed: Boolean;
-    FUpdatingStyleCombo: Boolean;
-    FStyleNames: TArray<string>;
-    FUpdatingHeader: Boolean;
     function ActiveSession: TForm;
+    function RecentSessionMenuItem(Index: Integer): TMenuItem;
+    procedure RefreshRecentSessionsMenu;
+    procedure RemoveRecentSessionFile(const FileName: string);
+    procedure RecentSessionClick(Sender: TObject);
     procedure SaveActiveSession(ForceFileName: Boolean);
     procedure OpenCommandLineSessions;
-    function ActiveStyleComboIndex: Integer;
-    procedure UpdateStyleComboBounds;
-    procedure WMUpdateHeader(var Message: TMessage); message WM_UPDATE_HEADER;
+    function ApplyApplicationStyle(const StyleName,
+      DisplayName: string): Boolean;
+    procedure WMRefreshHeader(var Message: TMessage); message WM_REFRESH_HEADER;
+    procedure WMRefreshRecentFiles(var Message: TMessage);
+      message WM_REFRESH_RECENT_FILES;
   protected
     procedure WndProc(var Message: TMessage); override;
   public
     function CloseQuery: Boolean; override;
     function NewSession: TForm;
     function OpenSessionFile(const FileName: string): TForm;
+    procedure RegisterRecentSessionFile(const FileName: string);
   end;
 
 var
@@ -95,7 +103,8 @@ implementation
 {$R *.dfm}
 
 uses
-  ImageDup.FormSession, ImageDup.FormAbout, ImageDup.Settings;
+  ImageDup.FormSession, ImageDup.FormAbout, ImageDup.FormSettings,
+  ImageDup.Settings;
 
 resourcestring
   rsUntitledSessionFmt = 'Session %d';
@@ -106,6 +115,9 @@ resourcestring
   rsCloseBusySessions = 'One or more sessions are busy. Stop the current operations before closing ImageDup.';
   rsStyleUnavailable = 'The selected style is unavailable.';
   rsStyleChangeErrorFmt = 'Unable to apply GUI style %s:%s%s';
+  rsRecentSessionMissingFmt =
+    'The recent session file is no longer available and has been removed ' +
+    'from the list:%s%s';
 
 function TFormMain.CloseQuery: Boolean;
 var
@@ -212,213 +224,181 @@ begin
   StyleChanged := Message.Msg = CM_CUSTOMSTYLECHANGED;
   inherited WndProc(Message);
   // Let VCL finish rebuilding the MDI frame and broadcasting the new style
-  // before measuring the title bar. Do not recreate its controls a second time.
+  // before repainting the custom title bar and menu.
   if StyleChanged and not (csDestroying in ComponentState) and HandleAllocated then
-    PostMessage(Handle, WM_UPDATE_HEADER, 0, 0);
+    PostMessage(Handle, WM_REFRESH_HEADER, 0, 0);
 end;
 
-procedure TFormMain.WMUpdateHeader(var Message: TMessage);
-var
-  UpdatingStyleCombo: Boolean;
+procedure TFormMain.WMRefreshHeader(var Message: TMessage);
 begin
   Message.Result := 0;
-  if (csDestroying in ComponentState) or FUpdatingHeader or not Assigned(TitleBarPanel) or not Assigned(StyleComboBox) then
+  if (csDestroying in ComponentState) or not Assigned(TitleBarPanel) then
     Exit;
-  UpdatingStyleCombo := FUpdatingStyleCombo;
-  FUpdatingStyleCombo := True;
-  FUpdatingHeader := True;
-  try
-    if CustomTitleBar.Enabled and (WindowState <> wsMinimized) then
-    begin
-      TitleBarPanel.Width := ClientWidth;
-      // TTitleBarPanel.Paint updates its bounds and caption buttons through
-      // VCL's own UpdateAlign, including maximized-window and DPI offsets.
-      TitleBarPanel.Repaint;
-    end;
-    UpdateStyleComboBounds;
-    StyleComboBox.ItemIndex := ActiveStyleComboIndex;
-    MenuBar.Invalidate;
-  finally
-    FUpdatingHeader := False;
-    FUpdatingStyleCombo := UpdatingStyleCombo;
+  if CustomTitleBar.Enabled and (WindowState <> wsMinimized) then
+  begin
+    TitleBarPanel.Width := ClientWidth;
+    TitleBarPanel.Repaint;
   end;
+  MenuBar.Invalidate;
 end;
 
-resourcestring
-  rsStyleLight = 'Light Theme';
-  rsStyleBlue = 'Blue Theme';
-  rsStyleDark = 'Dark Theme';
-  rsStyleGreen = 'Green Theme';
-  rsStylePurple = 'Purple Theme';
-  rsStyleSlateGray = 'Slate Gray Theme';
-
-function StyleDisplayName(const StyleName: string): string;
+procedure TFormMain.WMRefreshRecentFiles(var Message: TMessage);
 begin
-  if SameText(StyleName, 'Windows10') then
-    Result := rsStyleLight
-  else if SameText(StyleName, 'Windows10 Blue') then
-    Result := rsStyleBlue
-  else if SameText(StyleName, 'Windows10 Dark') then
-    Result := rsStyleDark
-  else if SameText(StyleName, 'Windows10 Green') then
-    Result := rsStyleGreen
-  else if SameText(StyleName, 'Windows10 Purple') then
-    Result := rsStylePurple
-  else if SameText(StyleName, 'Windows10 SlateGray') then
-    Result := rsStyleSlateGray
-  else
-    Result := StyleName;
-end;
-
-function TFormMain.ActiveStyleComboIndex: Integer;
-var
-  I: Integer;
-begin
-  Result := -1;
-  for I := 0 to High(FStyleNames) do
-    if SameText(FStyleNames[I], TStyleManager.ActiveStyle.Name) then
-      Exit(I);
+  Message.Result := 0;
+  if not (csDestroying in ComponentState) then
+    RefreshRecentSessionsMenu;
 end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
-var
-  StyleName: string;
 begin
+  FRecentSessionFiles := TStringList.Create;
+  FRecentSessionFiles.CaseSensitive := False;
+  LoadRecentSessionFiles(FRecentSessionFiles);
+  RefreshRecentSessionsMenu;
   if not CustomTitleBar.Enabled then
   begin
     GlassFrame.Enabled := False;
     GlassFrame.Top := 0;
     TitleBarPanel.Visible := False;
   end;
-  UpdateStyleComboBounds;
-  FUpdatingStyleCombo := True;
-  StyleComboBox.Items.BeginUpdate;
-  try
-    // Keep captions and internal VCL style names aligned by index.
-    StyleComboBox.Sorted := False;
-    StyleComboBox.Items.Clear;
-    SetLength(FStyleNames, 0);
-    for StyleName in TStyleManager.StyleNames do
-      if StyleName <> 'Windows' then
-      begin
-        SetLength(FStyleNames, Length(FStyleNames) + 1);
-        FStyleNames[High(FStyleNames)] := StyleName;
-        StyleComboBox.Items.Add(StyleDisplayName(StyleName));
-      end;
-    StyleComboBox.ItemIndex := ActiveStyleComboIndex;
-  finally
-    StyleComboBox.Items.EndUpdate;
-    FUpdatingStyleCombo := False;
-  end;
 end;
 
-procedure TFormMain.UpdateStyleComboBounds;
+procedure TFormMain.FormDestroy(Sender: TObject);
+begin
+  FreeAndNil(FRecentSessionFiles);
+end;
+
+procedure TFormMain.RefreshRecentSessionsMenu;
 var
-  ButtonsRect: TRect;
-  ParentWidth, ParentHeight, ButtonsLeft, ButtonWidth, Gap, ComboWidth, AvailableWidth, X, Y: Integer;
-
-  procedure ReserveCaptionButton(Control: TControl);
-  begin
-    if Assigned(Control) and Control.Visible then
-      Inc(ButtonWidth, Control.Width);
-  end;
-
+  FileName: string;
+  I: Integer;
+  Item: TMenuItem;
 begin
-  if not Assigned(StyleComboBox) or not Assigned(TitleBarPanel) or (StyleComboBox.Parent = nil) then
+  if not Assigned(FRecentSessionFiles) then
     Exit;
-  ParentWidth := StyleComboBox.Parent.ClientWidth;
-  ParentHeight := StyleComboBox.Parent.ClientHeight;
-  // Handle recreation can temporarily report an empty client area. Preserve
-  // visibility until the real dimensions are available after the style change.
-  if (ParentWidth <= 0) or (ParentHeight <= 0) then
-    Exit;
-  Gap := MulDiv(10, CurrentPPI, 96);
-  ComboWidth := MulDiv(150, CurrentPPI, 96);
-  ButtonsLeft := ParentWidth;
-  ButtonWidth := 0;
-  if CustomTitleBar.Enabled then
+  RecentSessionsSeparatorMenuItem.Visible := FRecentSessionFiles.Count > 0;
+  for I := 0 to MaxRecentSessionFiles - 1 do
   begin
-    if not CustomTitleBar.SystemButtons then
+    Item := RecentSessionMenuItem(I);
+    Item.OnClick := RecentSessionClick;
+    if I < FRecentSessionFiles.Count then
     begin
-      ReserveCaptionButton(TitleBarPanel.TitleButtonMin);
-      ReserveCaptionButton(TitleBarPanel.TitleButtonRestore);
-      ReserveCaptionButton(TitleBarPanel.TitleButtonClose);
-      if ButtonWidth > 0 then
-        ButtonsLeft := ParentWidth - ButtonWidth;
-    end;
-    if ButtonsLeft = ParentWidth then
+      FileName := FRecentSessionFiles[I];
+      Item.Caption := Format('&%d %s', [I + 1,
+        StringReplace(FileName, '&', '&&', [rfReplaceAll])]);
+      Item.Hint := FileName;
+      Item.Visible := True;
+    end
+    else
     begin
-      ButtonsRect := CustomTitleBar.CaptionButtonsRect;
-      if ButtonsRect.Width > 0 then
-        ButtonsLeft := ParentWidth - ButtonsRect.Width
-      else
-        ButtonsLeft := ParentWidth - MulDiv(138, CurrentPPI, 96);
+      Item.Hint := '';
+      Item.Visible := False;
     end;
   end;
-  AvailableWidth := ButtonsLeft - 2 * Gap;
-  StyleComboBox.Visible := AvailableWidth >= MulDiv(100, CurrentPPI, 96);
-  if not StyleComboBox.Visible then
-    Exit;
-  if ComboWidth > AvailableWidth then
-    ComboWidth := AvailableWidth;
-  X := ButtonsLeft - Gap - ComboWidth;
-  Y := (ParentHeight - StyleComboBox.Height) div 2;
-  if Y < 0 then
-    Y := 0;
-  StyleComboBox.SetBounds(X, Y, ComboWidth, StyleComboBox.Height);
 end;
 
-procedure TFormMain.FormResize(Sender: TObject);
+function TFormMain.RecentSessionMenuItem(Index: Integer): TMenuItem;
 begin
-  if FUpdatingHeader or FUpdatingStyleCombo or (csLoading in ComponentState) then
+  case Index of
+    0: Result := RecentSession1MenuItem;
+    1: Result := RecentSession2MenuItem;
+    2: Result := RecentSession3MenuItem;
+    3: Result := RecentSession4MenuItem;
+    4: Result := RecentSession5MenuItem;
+  else
+    Result := nil;
+  end;
+end;
+
+procedure TFormMain.RegisterRecentSessionFile(const FileName: string);
+var
+  FullName: string;
+  I: Integer;
+begin
+  if (FileName = '') or not Assigned(FRecentSessionFiles) then
     Exit;
-  UpdateStyleComboBounds;
+  FullName := ExpandFileName(FileName);
+  I := FRecentSessionFiles.IndexOf(FullName);
+  if I >= 0 then
+    FRecentSessionFiles.Delete(I);
+  FRecentSessionFiles.Insert(0, FullName);
+  while FRecentSessionFiles.Count > MaxRecentSessionFiles do
+    FRecentSessionFiles.Delete(FRecentSessionFiles.Count - 1);
+  SaveRecentSessionFiles(FRecentSessionFiles);
+  if HandleAllocated then
+    PostMessage(Handle, WM_REFRESH_RECENT_FILES, 0, 0);
+end;
+
+procedure TFormMain.RemoveRecentSessionFile(const FileName: string);
+var
+  I: Integer;
+begin
+  if not Assigned(FRecentSessionFiles) then
+    Exit;
+  I := FRecentSessionFiles.IndexOf(ExpandFileName(FileName));
+  if I >= 0 then
+  begin
+    FRecentSessionFiles.Delete(I);
+    SaveRecentSessionFiles(FRecentSessionFiles);
+    if HandleAllocated then
+      PostMessage(Handle, WM_REFRESH_RECENT_FILES, 0, 0);
+  end;
+end;
+
+procedure TFormMain.RecentSessionClick(Sender: TObject);
+var
+  FileName: string;
+  I: Integer;
+begin
+  if not (Sender is TMenuItem) or not Assigned(FRecentSessionFiles) then
+    Exit;
+  I := TMenuItem(Sender).Tag;
+  if (I < 0) or (I >= FRecentSessionFiles.Count) then
+    Exit;
+  FileName := FRecentSessionFiles[I];
+  if not FileExists(FileName) then
+  begin
+    RemoveRecentSessionFile(FileName);
+    MessageDlg(Format(rsRecentSessionMissingFmt,
+      [sLineBreak, FileName]), mtWarning, [mbOK], 0);
+    Exit;
+  end;
+  try
+    OpenSessionFile(FileName);
+  except
+    on E: Exception do
+      MessageDlg(Format(rsSessionLoadErrorFmt,
+        [sLineBreak, E.Message]), mtError, [mbOK], 0);
+  end;
 end;
 
 resourcestring
-  rsStylePreferenceSaveErrorFmt = 'The GUI style was applied, but the preference could not be saved:%s%s';
+  rsApplicationSettingsSaveErrorFmt = 'The settings were applied, but could not be saved:%s%s';
 
-procedure TFormMain.StyleComboBoxChange(Sender: TObject);
+function TFormMain.ApplyApplicationStyle(const StyleName,
+  DisplayName: string): Boolean;
 var
-  StyleName, DisplayName, ErrorText: string;
+  ErrorText: string;
 begin
-  if FUpdatingStyleCombo or (StyleComboBox.ItemIndex < 0) or (StyleComboBox.ItemIndex >= Length(FStyleNames)) then
-    Exit;
-  StyleName := FStyleNames[StyleComboBox.ItemIndex];
-  DisplayName := StyleComboBox.Items[StyleComboBox.ItemIndex];
   if SameText(StyleName, TStyleManager.ActiveStyle.Name) then
-    Exit;
+    Exit(True);
   ErrorText := '';
-  FUpdatingStyleCombo := True;
   try
-    try
-      if not TStyleManager.TrySetStyle(StyleName, False) then
-        ErrorText := rsStyleUnavailable;
-    except
-      on E: Exception do
-        ErrorText := E.Message;
-    end;
-    StyleComboBox.ItemIndex := ActiveStyleComboIndex;
-  finally
-    FUpdatingStyleCombo := False;
+    if not TStyleManager.TrySetStyle(StyleName, False) then
+      ErrorText := rsStyleUnavailable;
+  except
+    on E: Exception do
+      ErrorText := E.Message;
   end;
-  // Successful switches are followed by CM_CUSTOMSTYLECHANGED; updating
-  // here would still use the old HWND and can hide the combo during resize.
-  if ErrorText <> '' then
-    MessageDlg(Format(rsStyleChangeErrorFmt, [DisplayName, sLineBreak, ErrorText]), mtError, [mbOK], 0)
-  else
-    try
-      SaveApplicationStyle(TStyleManager.ActiveStyle.Name);
-    except
-      on E: Exception do
-        MessageDlg(Format(rsStylePreferenceSaveErrorFmt, [sLineBreak, E.Message]),
-          mtWarning, [mbOK], 0);
-    end;
+  Result := ErrorText = '';
+  if not Result then
+    MessageDlg(Format(rsStyleChangeErrorFmt, [DisplayName, sLineBreak,
+      ErrorText]), mtError, [mbOK], 0);
 end;
 
 procedure TFormMain.FormShow(Sender: TObject);
 begin
-  PostMessage(Handle, WM_UPDATE_HEADER, 0, 0);
+  PostMessage(Handle, WM_REFRESH_HEADER, 0, 0);
   if FStartupProcessed then
     Exit;
   FStartupProcessed := True;
@@ -535,6 +515,29 @@ end;
 procedure TFormMain.ActionArrangeIconsExecute(Sender: TObject);
 begin
   ArrangeIcons;
+end;
+
+procedure TFormMain.ActionSettingsExecute(Sender: TObject);
+var
+  ActiveStyle, SelectedStyle: string;
+  ThreadCount, SelectedThreadCount: Integer;
+begin
+  ActiveStyle := TStyleManager.ActiveStyle.Name;
+  ThreadCount := LoadApplicationThreadCount;
+  if not TFormSettings.Execute(Self, ActiveStyle, ThreadCount, SelectedStyle,
+    SelectedThreadCount) then
+    Exit;
+  if not ApplyApplicationStyle(SelectedStyle,
+    ApplicationStyleDisplayName(SelectedStyle)) then
+    Exit;
+  try
+    SaveApplicationSettings(TStyleManager.ActiveStyle.Name,
+      SelectedThreadCount);
+  except
+    on E: Exception do
+      MessageDlg(Format(rsApplicationSettingsSaveErrorFmt,
+        [sLineBreak, E.Message]), mtWarning, [mbOK], 0);
+  end;
 end;
 
 procedure TFormMain.ActionAboutExecute(Sender: TObject);

@@ -144,9 +144,9 @@
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.331;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.336;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_OutputDRCFile>true</DCC_OutputDRCFile>
-        <VerInfo_Build>331</VerInfo_Build>
+        <VerInfo_Build>336</VerInfo_Build>
         <VerInfo_Release>0</VerInfo_Release>
     </PropertyGroup>
     <ItemGroup>
@@ -161,6 +161,9 @@
         </DCCReference>
         <DCCReference Include="ImageDup.FormAbout.pas">
             <Form>FormAbout</Form>
+        </DCCReference>
+        <DCCReference Include="ImageDup.FormSettings.pas">
+            <Form>FormSettings</Form>
         </DCCReference>
         <DCCReference Include="ImageDup.Options.pas">
             <Form>OptionsForm</Form>

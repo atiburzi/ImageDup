@@ -109,7 +109,6 @@ type
     ClearSelectionsItem: TMenuItem;
     ActionList: TActionList;
     ActionNewSession: TAction;
-    ActionSaveSession: TAction;
     ActionLoadSession: TAction;
     ActionBrowse: TAction;
     ActionStartScan: TAction;
@@ -181,6 +180,8 @@ type
     procedure ResultsTreeNodeDblClick(Sender: TBaseVirtualTree; const HitInfo: THitInfo);
     procedure ResultsTreeMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure ResultsTreeKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure ResultsTreeMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure SelectionMenuPopup(Sender: TObject);
@@ -215,7 +216,6 @@ type
     procedure ActionEnsureUnselectedExecute(Sender: TObject);
     procedure ActionClearSelectionsExecute(Sender: TObject);
     procedure ActionNewSessionExecute(Sender: TObject);
-    procedure ActionSaveSessionExecute(Sender: TObject);
     procedure ActionLoadSessionExecute(Sender: TObject);
     procedure ActionOptionsExecute(Sender: TObject);
     procedure ActionExportExcelExecute(Sender: TObject);
@@ -242,7 +242,7 @@ type
     FStatusMessage: string;
     FSelectionContextFileName: string;
     FSessionFileName: string;
-    FComparisonQuality, FThreadCount: Integer;
+    FComparisonQuality: Integer;
     FRecursiveSearch: Boolean;
     FIncludeSingletons: Boolean;
     procedure RefreshActionStates;
@@ -269,6 +269,7 @@ type
     function SelectionContextValid: Boolean;
     procedure ShowSelectionMenuAt(const ScreenPoint: TPoint;
       ContextGroup, ContextMember: Integer);
+    function NavigateToAdjacentGroup(Direction: Integer): Boolean;
     procedure SortGroupsBySize(Ascending: Boolean);
     procedure SortMembers(Column: Integer; Ascending: Boolean);
     function HasCheckedFiles: Boolean;
@@ -284,14 +285,13 @@ type
     function SelectedFiles: TArray<string>;
     procedure UpdateMovedFiles(const MovedFiles: TDictionary<string, string>);
   public
-    procedure SetSearchOptions(AQuality, AThreadCount: Integer;
-      ARecursive: Boolean; AIncludeSingletons: Boolean = False);
+    procedure SetSearchOptions(AQuality: Integer; ARecursive: Boolean;
+      AIncludeSingletons: Boolean = False);
     property Worker: TImageScan read FWorker;
     property ScannedFileCount: Integer read FScannedFileCount;
     property SelectedFileBytes: Int64 read CheckedFileBytes;
     property SelectedFileCount: Integer read CheckedFileCount;
     property ComparisonQuality: Integer read FComparisonQuality;
-    property ProcessingThreadCount: Integer read FThreadCount;
     property RecursiveSearch: Boolean read FRecursiveSearch;
     function PreviewCardCount: Integer;
     function PreviewCard(Index: Integer): TPreviewCard;
@@ -320,7 +320,7 @@ implementation
 uses
   System.IOUtils, System.Math, ImageDup.Session, ImageDup.Core, ImageDup.Recycle,
   ImageDup.Options, ImageDup.ExcelExport, ImageDup.FormAbout,
-  ImageDup.FileMove, Winapi.ShlObj, Winapi.ActiveX,
+  ImageDup.FileMove, ImageDup.Settings, Winapi.ShlObj, Winapi.ActiveX,
   Vcl.Imaging.pngimage;
 
 const
@@ -621,7 +621,7 @@ begin
   FPreviewMemberCount := 0;
   FSortColumn := -1;
   FSortAscending := True;
-  SetSearchOptions(8, 3, True);
+  SetSearchOptions(8, True);
   ZoomCursor := LoadCursor(HInstance, PChar(ZoomInCursorResource));
   if ZoomCursor = 0 then
     ZoomCursor := LoadImage(0, PChar(TPath.GetFullPath(
@@ -647,11 +647,13 @@ begin
   UpdateCheckedSizeStatus;
   ActionNewSession.Visible := False;
   ActionLoadSession.Visible := False;
-  ActionSaveSession.Visible := False;
   ActionAbout.Visible := False;
   ToolButtonNewSession.Visible := False;
   ToolButtonLooadSession.Visible := False;
-  ToolButtonSaveSession.Visible := False;
+  ToolButtonSaveSession.Visible := True;
+  if Application.MainForm is TFormMain then
+    ToolButtonSaveSession.Action :=
+      TFormMain(Application.MainForm).ActionSaveSession;
   ToolButtonSep1.Visible := False;
   ToolButtonSep2.Visible := False;
 end;
@@ -874,7 +876,6 @@ begin
   ActionStartScan.Enabled := (not Busy) and HasRoots;
   ActionStopScan.Enabled := CanStop;
   ActionLoadSession.Enabled := not Busy;
-  ActionSaveSession.Enabled := (not Busy) and HasSessionContent;
   ActionNewSession.Enabled := not Busy;
   ActionShowErrors.Enabled := (not Busy) and Assigned(FErrors) and
     (FErrors.Count > 0);
@@ -931,20 +932,17 @@ begin
       Exit(True);
 end;
 
-procedure TFormSession.SetSearchOptions(AQuality, AThreadCount: Integer;
+procedure TFormSession.SetSearchOptions(AQuality: Integer;
   ARecursive: Boolean; AIncludeSingletons: Boolean);
 var
-  NewQuality, NewThreadCount: Integer;
+  NewQuality: Integer;
   Changed: Boolean;
 begin
   NewQuality := EnsureRange(AQuality, MinComparisonQuality,
     MaxComparisonQuality);
-  NewThreadCount := EnsureRange(AThreadCount, 1, 64);
   Changed := (FComparisonQuality <> NewQuality) or
-    (FThreadCount <> NewThreadCount) or
     (FRecursiveSearch <> ARecursive) or (FIncludeSingletons <> AIncludeSingletons);
   FComparisonQuality := NewQuality;
-  FThreadCount := NewThreadCount;
   FRecursiveSearch := ARecursive;
   FIncludeSingletons := AIncludeSingletons;
   if Changed then
@@ -953,16 +951,15 @@ end;
 
 procedure TFormSession.ActionOptionsExecute(Sender: TObject);
 var
-  Quality, ThreadCount: Integer;
+  Quality: Integer;
   Recursive, IncludeSingletons: Boolean;
 begin
   Quality := FComparisonQuality;
-  ThreadCount := FThreadCount;
   Recursive := FRecursiveSearch;
   IncludeSingletons := FIncludeSingletons;
-  if TOptionsForm.Execute(Self, Quality, ThreadCount, Recursive, IncludeSingletons) then
+  if TOptionsForm.Execute(Self, Quality, Recursive, IncludeSingletons) then
   begin
-    SetSearchOptions(Quality, ThreadCount, Recursive, IncludeSingletons);
+    SetSearchOptions(Quality, Recursive, IncludeSingletons);
     SetStatusMessage(rsOptionsUpdated);
   end;
 end;
@@ -1054,7 +1051,7 @@ procedure TFormSession.ActionStartScanExecute(Sender: TObject);
 var
   Roots: TList<string>;
   Path, Root: string;
-  DistanceLimit: Integer;
+  DistanceLimit, ThreadCount: Integer;
 begin
   if Assigned(FWorker) then
     Exit;
@@ -1072,8 +1069,9 @@ begin
       if Roots.Count = 0 then
         raise EArgumentException.Create(rsFolderRequired);
       DistanceLimit := ComparisonQualityToDistance(FComparisonQuality);
+      ThreadCount := LoadApplicationThreadCount;
       FWorker := TImageScan.Create(Roots.ToArray, FRecursiveSearch, DistanceLimit, DefaultMaxRGBError,
-        FThreadCount, FIncludeSingletons);
+        ThreadCount, FIncludeSingletons);
     except
       on E: Exception do
       begin
@@ -1092,7 +1090,7 @@ begin
     FSelectedMember := -1;
     ClearPreviews;
     ResultsLabel.Caption := rsScanInProgress;
-    SetStatusMessage(Format(rsStartingScanFmt, [FThreadCount]));
+    SetStatusMessage(Format(rsStartingScanFmt, [ThreadCount]));
     StatusProgress.Style := pbstMarquee;
     StatusProgress.Position := 0;
     SetProgressVisible(True);
@@ -1527,12 +1525,40 @@ end;
 procedure TFormSession.ResultsTreeMouseWheel(Sender: TObject;
   Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint;
   var Handled: Boolean);
+begin
+  Handled := False;
+  if not (ssShift in Shift) or (WheelDelta = 0) then
+    Exit;
+
+  if WheelDelta < 0 then
+    Handled := NavigateToAdjacentGroup(1)
+  else
+    Handled := NavigateToAdjacentGroup(-1);
+end;
+
+procedure TFormSession.ResultsTreeKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if not (ssShift in Shift) then
+    Exit;
+
+  case Key of
+    VK_UP:
+      if NavigateToAdjacentGroup(-1) then
+        Key := 0;
+    VK_DOWN:
+      if NavigateToAdjacentGroup(1) then
+        Key := 0;
+  end;
+end;
+
+function TFormSession.NavigateToAdjacentGroup(Direction: Integer): Boolean;
 var
   CurrentNode, GroupNode, TargetNode: PVirtualNode;
   Data: PNodeData;
 begin
-  Handled := False;
-  if not (ssShift in Shift) or (WheelDelta = 0) or FUpdatingTree then
+  Result := False;
+  if (Direction = 0) or FUpdatingTree then
     Exit;
 
   CurrentNode := ResultsTree.FocusedNode;
@@ -1548,11 +1574,11 @@ begin
   if not Assigned(GroupNode) or (GroupNode = ResultsTree.RootNode) then
     Exit;
 
-  if WheelDelta < 0 then
+  Result := True;
+  if Direction > 0 then
     TargetNode := ResultsTree.GetNextSibling(GroupNode)
   else
     TargetNode := ResultsTree.GetPreviousSibling(GroupNode);
-  Handled := True;
   if not Assigned(TargetNode) then
     Exit;
 
@@ -1843,7 +1869,7 @@ begin
     Exit;
   CloseFullSize(False);
   PathsMemo.Clear;
-  SetSearchOptions(8, 3, True);
+  SetSearchOptions(8, True);
   FGroups.Clear;
   FMetricReferences.Clear;
   FScannedFileCount := 0;
@@ -1859,19 +1885,6 @@ begin
   StatusProgress.Position := 0;
   SetProgressVisible(False);
   RefreshActionStates;
-end;
-
-procedure TFormSession.ActionSaveSessionExecute(Sender: TObject);
-begin
-  try
-    if SaveSessionDialog.Execute(Handle) then
-    begin
-      SaveDocument(SaveSessionDialog.FileName);
-    end;
-  except
-    on E: Exception do
-      MessageDlg(Format(rsSessionSaveErrorFmt, [sLineBreak, E.Message]), mtError, [mbOK], 0);
-  end;
 end;
 
 procedure TFormSession.RecalculateReferenceMetrics(var Group: TImageGroup);
@@ -2824,7 +2837,6 @@ var
 begin
   State.Quality := FComparisonQuality;
   State.PixelError := DefaultMaxRGBError;
-  State.ThreadCount := FThreadCount;
   State.ScannedFiles := FScannedFileCount;
   State.Roots := PathsMemo.Lines.ToStringArray;
   State.Recursive := FRecursiveSearch;
@@ -2854,7 +2866,6 @@ begin
   State := LoadSession(FileName);
   if (State.Quality < MinComparisonQuality) or
     (State.Quality > MaxComparisonQuality) or
-    (State.ThreadCount < 1) or (State.ThreadCount > 64) or
     (State.ScannedFiles < 0) then
     raise EConvertError.Create(rsInvalidSavedCriteria);
   PathsMemo.Lines.BeginUpdate;
@@ -2865,7 +2876,7 @@ begin
   finally
     PathsMemo.Lines.EndUpdate;
   end;
-  SetSearchOptions(State.Quality, State.ThreadCount, State.Recursive, State.IncludeSingletons);
+  SetSearchOptions(State.Quality, State.Recursive, State.IncludeSingletons);
   FScannedFileCount := State.ScannedFiles;
   FGroups.Clear;
   FMetricReferences.Clear;
@@ -3024,6 +3035,9 @@ begin
   SetModified(False);
   SetStatusMessage(Format(rsSessionLoadedFileFmt,
     [FSessionFileName, FScannedFileCount]));
+  if Application.MainForm is TFormMain then
+    TFormMain(Application.MainForm).RegisterRecentSessionFile(
+      FSessionFileName);
 end;
 
 procedure TFormSession.SaveDocument(const FileName: string);
@@ -3033,6 +3047,9 @@ begin
   Caption := ExtractFileName(FSessionFileName);
   SetModified(False);
   SetStatusMessage(Format(rsSessionSavedFmt, [FSessionFileName]));
+  if Application.MainForm is TFormMain then
+    TFormMain(Application.MainForm).RegisterRecentSessionFile(
+      FSessionFileName);
 end;
 
 function TFormSession.CanSaveDocument: Boolean;

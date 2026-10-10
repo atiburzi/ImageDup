@@ -4458,7 +4458,7 @@ object FormSession: TFormSession
     Cursor = crVSplit
     Align = alBottom
     AutoSnap = False
-    MinSize = 150
+    MinSize = 1
     ResizeStyle = rsUpdate
     ExplicitTop = 757
     ExplicitWidth = 1601
@@ -4467,16 +4467,17 @@ object FormSession: TFormSession
     Left = 0
     Top = 48
     Width = 1599
-    Height = 137
+    Height = 89
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 1597
     DesignSize = (
       1599
-      137)
+      89)
     object PathsLabel: TLabel
       Left = 16
-      Top = 8
+      Top = -5
       Width = 227
       Height = 17
       Caption = 'Folders to compare (one path per line)'
@@ -4484,58 +4485,61 @@ object FormSession: TFormSession
     end
     object PathsMemo: TMemo
       Left = 16
-      Top = 31
+      Top = 18
       Width = 1450
-      Height = 100
+      Height = 66
       Anchors = [akLeft, akTop, akRight]
       ScrollBars = ssVertical
       TabOrder = 0
       WordWrap = False
       OnChange = PathsMemoChange
+      ExplicitWidth = 1448
     end
     object BrowseButton: TButton
       Left = 1472
-      Top = 31
+      Top = 18
       Width = 111
-      Height = 100
+      Height = 66
       Action = ActionBrowse
       Anchors = [akTop, akRight]
       ImageAlignment = iaTop
       ImageIndex = 2
       ImageName = 'check'
-      ImageMargins.Top = 20
+      ImageMargins.Top = 5
       Images = DataModuleResources.VirtualImageList32
       TabOrder = 1
+      ExplicitLeft = 1470
     end
   end
   object ResultsPanel: TPanel
     Left = 0
-    Top = 185
+    Top = 137
     Width = 1599
-    Height = 565
+    Height = 613
     Align = alClient
     BevelOuter = bvNone
-    Constraints.MinHeight = 100
+    Constraints.MinHeight = 150
     Padding.Left = 16
     Padding.Right = 16
     TabOrder = 1
+    ExplicitWidth = 1597
+    ExplicitHeight = 605
     object ResultsLabel: TLabel
       Left = 16
       Top = 0
-      Width = 1569
+      Width = 1567
       Height = 30
       Align = alTop
       AutoSize = False
       Caption = 'Similar image groups - add folders and start the search'
       Layout = tlCenter
-      ExplicitLeft = -424
-      ExplicitTop = -6
+      ExplicitTop = -8
     end
     object ResultsTree: TVirtualStringTree
       Left = 16
       Top = 30
-      Width = 1569
-      Height = 543
+      Width = 1567
+      Height = 583
       Hint = 
         'Expand groups, select a file to compare it, and use the checkbox' +
         ' to mark it.'
@@ -4559,13 +4563,12 @@ object FormSession: TFormSession
       OnGetText = ResultsTreeGetText
       OnGetImageIndex = ResultsTreeGetImageIndex
       OnHeaderClick = ResultsTreeHeaderClick
+      OnKeyDown = ResultsTreeKeyDown
       OnMouseDown = ResultsTreeMouseDown
       OnMouseWheel = ResultsTreeMouseWheel
       OnNodeDblClick = ResultsTreeNodeDblClick
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-      ExplicitWidth = 1567
-      ExplicitHeight = 535
       Columns = <
         item
           Position = 0
@@ -4610,10 +4613,12 @@ object FormSession: TFormSession
     ParentFont = False
     TabOrder = 2
     OnResize = PreviewPanelResize
+    ExplicitTop = 748
+    ExplicitWidth = 1597
     object PreviewScroll: TScrollBox
       Left = 0
       Top = 0
-      Width = 1601
+      Width = 1599
       Height = 362
       HorzScrollBar.Visible = False
       VertScrollBar.Visible = False
@@ -4622,7 +4627,7 @@ object FormSession: TFormSession
       Color = clBtnFace
       ParentColor = False
       TabOrder = 0
-      ExplicitWidth = 1599
+      ExplicitWidth = 1597
     end
   end
   object ToolBar: TToolBar
@@ -4643,6 +4648,7 @@ object FormSession: TFormSession
     List = True
     AllowTextButtons = True
     TabOrder = 3
+    ExplicitWidth = 1597
     object ToolButtonNewSession: TToolButton
       Left = 0
       Top = 0
@@ -4680,14 +4686,16 @@ object FormSession: TFormSession
       Style = tbsTextButton
     end
     object ToolButtonSaveSession: TToolButton
-      Left = 253
+      Left = 0
       Top = 0
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
       Margins.Bottom = 4
-      Action = ActionSaveSession
+      Caption = 'Save session'
+      Hint = 'Save the current search criteria and results'
       ImageIndex = 27
+      ImageName = 'save'
       Style = tbsTextButton
     end
     object ToolButtonSep2: TToolButton
@@ -4852,6 +4860,8 @@ object FormSession: TFormSession
         Style = psOwnerDraw
         Width = 280
       end>
+    ExplicitTop = 1110
+    ExplicitWidth = 1597
   end
   object StatusProgress: TProgressBar
     Left = 1416
@@ -5037,15 +5047,6 @@ object FormSession: TFormSession
       ImageName = 'new'
       Visible = False
       OnExecute = ActionNewSessionExecute
-    end
-    object ActionSaveSession: TAction
-      Caption = 'Save session'
-      Enabled = False
-      Hint = 'Save the current search criteria and results'
-      ImageIndex = 24
-      ImageName = 'save'
-      Visible = False
-      OnExecute = ActionSaveSessionExecute
     end
     object ActionLoadSession: TAction
       Caption = 'Load session'

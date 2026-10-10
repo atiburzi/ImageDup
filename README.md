@@ -24,7 +24,7 @@
 
 ImageDup compares image content to find resized copies, recompressions, and sufficiently similar variants. It organizes results into groups, calculates a technical quality ranking to help choose a reference, and lets you select, export, move, or send files to the Recycle Bin.
 
-The application uses an MDI interface: each child window holds an independent session with its own folders, options, results, and selections.
+The application uses an MDI interface: each child window holds an independent session with its own folders, matching criteria, results, and selections. Visual theme and worker-thread count are application-wide settings shared by all sessions.
 
 The Delphi project is in [`Source/`](Source/); translations, icons, and artwork are kept separately. The formulas and thresholds below describe the current source, not benchmark results or planned features.
 
@@ -82,7 +82,7 @@ ImageDup is useful for consolidating photo archives, cleaning folders collected 
 
 1. Choose **New session** in the main window.
 2. Add one or more folders. The modern folder picker supports multiple selections, and every selected path is shown explicitly in the session.
-3. Open **Options** to balance matching strictness and processing resources for that collection.
+3. Open the session **Options** to tune matching criteria for that collection. Use the main-window **Settings** command to choose the application theme and worker-thread count.
 4. Select **Start search**. ImageDup enumerates the supported files, decodes and analyzes them on worker threads, and adds groups to the tree as results become available.
 5. Select a group to compare all of its members in the adaptive preview area.
 6. Confirm or change the reference, then apply a selection rule and inspect the resulting checkboxes.
@@ -90,18 +90,19 @@ ImageDup is useful for consolidating photo archives, cleaning folders collected 
 
 A search becomes available after at least one folder is specified. Paths are validated when scanning starts, and commands are enabled only when they make sense for the current session state.
 
-### Tune each session
+### Tune sessions and the application
 
-Every session keeps its own scan criteria, allowing a strict archival review and a broader discovery scan to coexist in the same application.
+Every session keeps its own matching criteria, allowing a strict archival review and a broader discovery scan to coexist in the same application. Worker count and visual theme belong to the application and are restored for the current Windows user.
 
-| Option | Range / initial value | Practical effect |
-|---|---|---|
-| Matching quality index | 0–10; initially 8 | Controls the maximum distance between DCT hashes. Higher values demand a closer perceptual match; lower values explore broader similarities. |
-| Number of threads | 1–64; initially 3 | Sets the number of workers decoding and analyzing images. The best value depends on storage speed, processor capacity, and the number of concurrent sessions. |
-| Include subfolders | Initially enabled | Extends the scan through the complete directory tree below every selected root. |
-| Include groups without duplicates | Initially disabled | Also shows single-file groups, useful when the session is being used as a collection inventory. |
+| Setting | Scope | Range / initial value | Practical effect |
+|---|---|---|---|
+| Matching quality index | Session | 0–10; initially 8 | Controls the maximum distance between DCT hashes. Higher values demand a closer perceptual match; lower values explore broader similarities. |
+| Include subfolders | Session | Initially enabled | Extends the scan through the complete directory tree below every selected root. |
+| Include groups without duplicates | Session | Initially disabled | Also shows single-file groups, useful when the session is being used as a collection inventory. |
+| Number of processing threads | Application | 1–64; initially 3 | Sets the number of workers used by every subsequently started scan. The best value depends on storage speed, processor capacity, memory, and the number of concurrent sessions. |
+| Visual theme | Application | Bundled VCL styles | Applies the selected appearance to the main window and open sessions and restores it at the next startup. |
 
-Changed options take effect on the next scan; they do not silently rebuild results that are already being reviewed. The matching quality index controls the DCT distance threshold, while additional RGB and structural checks continue to protect against weak hash-only matches.
+Changed scan settings take effect on the next scan; they do not silently rebuild results that are already being reviewed. The matching quality index controls the DCT distance threshold, while additional RGB and structural checks continue to protect against weak hash-only matches.
 
 ### Review groups with the evidence in view
 
@@ -110,7 +111,7 @@ The result tree keeps the essential facts beside each file: selection state, ful
 - Members start in descending quality order, placing the strongest reference candidate first.
 - Clicking **File / group** alternates the order of all groups by member count.
 - Clicking another column sorts the members inside each group by that property.
-- **Shift + mouse wheel** moves directly between groups during a review.
+- **Shift + Up/Down** or **Shift + mouse wheel** moves directly between groups during a review.
 - The preview gallery automatically chooses a layout and image size suited to the number of members and the available window area.
 - Each preview includes dimensions, storage size, DPI information, timestamp, quality, and relevant comparison metrics.
 - The status bar reports scan progress, totals, errors, and both the number and combined size of selected files.
@@ -798,8 +799,7 @@ An illustrative empty session:
     "recursive": true,
     "includeSingletons": false,
     "quality": 8,
-    "pixelError": 0.08,
-    "threadCount": 3
+    "pixelError": 0.08
   },
   "selectedFiles": [],
   "groups": []
@@ -813,7 +813,7 @@ For each member, it stores path, dimensions, DPI, bytes, modification time, qual
 Compatibility behavior:
 
 - Missing includeSingletons means false.
-- Missing threadCount means 3.
+- A legacy threadCount field is accepted and ignored; worker count is now an application setting.
 - If quality is missing, an older distance value is converted.
 - Several later metadata fields have default values.
 - qualityScore is saved, but group ranking is recalculated on load.
@@ -859,7 +859,7 @@ Export includes session results, not just checked files. It does not embed image
 
 ### What runs in parallel
 
-Each scan creates a **TImageScan** coordinator, the configured number of **TSignatureWorker** threads, and a queue synchronized with TMonitor.
+Each scan creates a **TImageScan** coordinator, the application-wide number of **TSignatureWorker** threads, and a queue synchronized with TMonitor. The value is read when the scan starts, so changing it does not alter scans already running.
 
 Workers read and decode files, construct signatures, and analyze technical quality. The coordinator consumes results in original order, compares signatures, and updates groups.
 
@@ -939,12 +939,14 @@ The DCT and RGB loops are not wholly implemented in assembly language.
 |---|---|
 | [ImageDup.dpr](Source/ImageDup.dpr) | Startup, resources, style, and creation of forms/data module. |
 | [ImageDup.FormMain.pas](Source/ImageDup.FormMain.pas) | MDI container, documents, coordinated closing. |
+| [ImageDup.FormSettings.pas](Source/ImageDup.FormSettings.pas) | Application settings for appearance and processing threads. |
 | [ImageDup.FormSession.pas](Source/ImageDup.FormSession.pas) | Tree, selections, previews, commands, and session state. |
 | [ImageDup.Options.pas](Source/ImageDup.Options.pas) | Scan options dialog. |
 | [ImageDup.Scan.pas](Source/ImageDup.Scan.pas) | Enumeration, workers, and coordinator. |
 | [ImageDup.Core.pas](Source/ImageDup.Core.pas) | WIC, signatures, DCT, RGB, SSIM, and pixel metrics. |
 | [ImageDup.Groups.pas](Source/ImageDup.Groups.pas) | Grouping, identity, ranking, and reference. |
 | [ImageDup.Session.pas](Source/ImageDup.Session.pas) | JSON session serialization. |
+| [ImageDup.Settings.pas](Source/ImageDup.Settings.pas) | Per-user persistence of application-wide settings. |
 | [ImageDup.ExcelExport.pas](Source/ImageDup.ExcelExport.pas) | XLSX generation. |
 | [ImageDup.Recycle.pas](Source/ImageDup.Recycle.pas) | Recycle Bin operations. |
 | [ImageDup.FileMove.pas](Source/ImageDup.FileMove.pas) | Structure-preserving moves. |
@@ -972,9 +974,9 @@ The DPR needs both directives:
 {$R *.dres}
 ~~~
 
-[`Source/ImageDup.res`](Source/ImageDup.res) contains the application resources. Delphi also generates a `.dres` file for the VCL styles listed in the project options. The bundled style names are Windows10, Windows10 Blue, Windows10 Dark, Windows10 Green, Windows10 Purple, and Windows10 SlateGray; the combo box displays shorter translated captions.
+[`Source/ImageDup.res`](Source/ImageDup.res) contains the application resources. Delphi also generates a `.dres` file for the VCL styles listed in the project options. The bundled style names are Windows10, Windows10 Blue, Windows10 Dark, Windows10 Green, Windows10 Purple, and Windows10 SlateGray; the Settings dialog displays shorter translated captions.
 
-Startup selects Windows10, then restores the last chosen style from the current user's `Software\ImageDup` registry key. If the saved style is unavailable, startup falls back to the default. The internal style name must match a style actually embedded or loaded. For “Style ... not found”, check `Custom_Styles` and both resource directives; a VSF file on disk alone is insufficient.
+Startup selects Windows10, then restores the last chosen style from the current user's `Software\ImageDup` registry key. The same key stores the application-wide worker-thread count. If the saved style is unavailable, startup falls back to the default. The internal style name must match a style actually embedded or loaded. For “Style ... not found”, check `Custom_Styles` and both resource directives; a VSF file on disk alone is insufficient.
 
 ### Localization
 

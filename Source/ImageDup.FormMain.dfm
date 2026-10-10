@@ -4721,7 +4721,7 @@ object FormMain: TFormMain
   Position = poScreenCenter
   StyleElements = [seFont, seClient]
   OnCreate = FormCreate
-  OnResize = FormResize
+  OnDestroy = FormDestroy
   OnShow = FormShow
   TextHeight = 17
   object TitleBarPanel: TTitleBarPanel
@@ -4730,21 +4730,6 @@ object FormMain: TFormMain
     Width = 1280
     Height = 39
     CustomButtons = <>
-    DesignSize = (
-      1280
-      39)
-    object StyleComboBox: TComboBox
-      Left = 992
-      Top = 7
-      Width = 140
-      Height = 25
-      Hint = 'Change the application style'
-      Style = csDropDownList
-      Anchors = [akTop, akRight]
-      Sorted = True
-      TabOrder = 0
-      OnChange = StyleComboBoxChange
-    end
   end
   object MenuBar: TToolBar
     Left = 0
@@ -4761,7 +4746,7 @@ object FormMain: TFormMain
   end
   object FormTabsBar: TFormTabsBar
     Left = 0
-    Top = 102
+    Top = 62
     Width = 1280
     Height = 30
     ParentColor = False
@@ -4772,51 +4757,6 @@ object FormMain: TFormMain
     TabMinWidth = 100
     TabMaxWidth = 250
     ShowTabsMenuButton = True
-  end
-  object ToolBar: TToolBar
-    Left = 0
-    Top = 62
-    Width = 1280
-    Height = 40
-    AutoSize = True
-    ButtonHeight = 38
-    ButtonWidth = 119
-    Flat = False
-    HideClippedButtons = True
-    Images = DataModuleResources.VirtualImageList32
-    List = True
-    AllowTextButtons = True
-    TabOrder = 3
-    object ToolButtonNew: TToolButton
-      Left = 0
-      Top = 0
-      Action = ActionNewSession
-      Style = tbsTextButton
-    end
-    object ToolButtonLoad: TToolButton
-      Left = 120
-      Top = 0
-      Action = ActionLoadSession
-      Style = tbsTextButton
-    end
-    object ToolButtonSave: TToolButton
-      Left = 243
-      Top = 0
-      Action = ActionSaveSession
-      Style = tbsTextButton
-    end
-    object ToolButtonFileSeparator: TToolButton
-      Left = 364
-      Top = 0
-      Width = 10
-      Style = tbsSeparator
-    end
-    object ToolButtonAbout: TToolButton
-      Left = 374
-      Top = 0
-      Action = ActionAbout
-      Style = tbsTextButton
-    end
   end
   object ActionList: TActionList
     Images = DataModuleResources.VirtualImageList32
@@ -4905,6 +4845,14 @@ object FormMain: TFormMain
       ImageName = 'window-arrange-icons'
       OnExecute = ActionArrangeIconsExecute
     end
+    object ActionSettings: TAction
+      Category = 'Tools'
+      Caption = 'Settings'
+      Hint = 'Configure application-wide settings'
+      ImageIndex = 40
+      ImageName = 'settings'
+      OnExecute = ActionSettingsExecute
+    end
     object ActionAbout: TAction
       Category = 'Help'
       Caption = 'About...'
@@ -4960,6 +4908,34 @@ object FormMain: TFormMain
       object CloseSessionMenuItem: TMenuItem
         Action = ActionCloseSession
       end
+      object RecentSessionsSeparatorMenuItem: TMenuItem
+        Caption = '-'
+        Visible = False
+      end
+      object RecentSession1MenuItem: TMenuItem
+        Caption = 'Recent session 1'
+        Visible = False
+      end
+      object RecentSession2MenuItem: TMenuItem
+        Tag = 1
+        Caption = 'Recent session 2'
+        Visible = False
+      end
+      object RecentSession3MenuItem: TMenuItem
+        Tag = 2
+        Caption = 'Recent session 3'
+        Visible = False
+      end
+      object RecentSession4MenuItem: TMenuItem
+        Tag = 3
+        Caption = 'Recent session 4'
+        Visible = False
+      end
+      object RecentSession5MenuItem: TMenuItem
+        Tag = 4
+        Caption = 'Recent session 5'
+        Visible = False
+      end
       object FileSeparatorMenuItem: TMenuItem
         Caption = '-'
       end
@@ -4983,6 +4959,12 @@ object FormMain: TFormMain
         Action = ActionTileVertical
         ImageIndex = 38
         ImageName = 'window-tile-horizontal'
+      end
+    end
+    object ToolsMenu: TMenuItem
+      Caption = '&Tools'
+      object SettingsMenuItem: TMenuItem
+        Action = ActionSettings
       end
     end
     object HelpMenu: TMenuItem

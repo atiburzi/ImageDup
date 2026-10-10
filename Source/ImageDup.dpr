@@ -5,6 +5,7 @@ uses
   ImageDup.FormMain in 'ImageDup.FormMain.pas' {FormMain},
   ImageDup.FormSession in 'ImageDup.FormSession.pas' {FormSession},
   ImageDup.FormAbout in 'ImageDup.FormAbout.pas' {FormAbout},
+  ImageDup.FormSettings in 'ImageDup.FormSettings.pas' {FormSettings},
   ImageDup.Options in 'ImageDup.Options.pas' {OptionsForm},
   ImageDup.ExcelExport in 'ImageDup.ExcelExport.pas',
   ImageDup.Scan in 'ImageDup.Scan.pas',
