@@ -73,6 +73,7 @@ Scanning and analysis run locally on the Windows PC. Results remain under the us
 | **Controlled batch selection** | Selects files relative to the reference or by folder relationship, while keeping checkboxes visible and ensuring that a group can retain at least one file. |
 | **Safer cleanup choices** | Sends selected files to the Windows Recycle Bin or moves them to another folder while preserving their directory structure. |
 | **Reusable work sessions** | Saves criteria, groups, references, and selections in an `.idup` document, then restores them without repeating the scan. |
+| **Session revalidation** | Rechecks every stored path on demand and removes entries for files that no longer exist. |
 | **Multiple independent sessions** | Uses an MDI workspace so different archives, criteria, and result sets can stay open at the same time. |
 | **Portable reporting** | Exports the result tree to `.xlsx` without requiring Microsoft Excel. |
 
@@ -86,7 +87,8 @@ ImageDup is useful for consolidating photo archives, cleaning folders collected 
 4. Select **Start search**. ImageDup enumerates the supported files, decodes and analyzes them on worker threads, and adds groups to the tree as results become available.
 5. Select a group to compare all of its members in the adaptive preview area.
 6. Confirm or change the reference, then apply a selection rule and inspect the resulting checkboxes.
-7. Save the `.idup` session, export an Excel report, move the selected files, or send them to the Recycle Bin.
+7. Use **Show single-file groups** when the complete image inventory is useful, or hide them to focus on duplicates.
+8. Save the `.idup` session, export an Excel report, move the selected files, or send them to the Recycle Bin. **Revalidate files** removes stale entries after files have been changed outside ImageDup.
 
 A search becomes available after at least one folder is specified. Paths are validated when scanning starts, and commands are enabled only when they make sense for the current session state.
 
@@ -98,7 +100,7 @@ Every session keeps its own matching criteria, allowing a strict archival review
 |---|---|---|---|
 | Matching quality index | Session | 0–10; initially 8 | Controls the maximum distance between DCT hashes. Higher values demand a closer perceptual match; lower values explore broader similarities. |
 | Include subfolders | Session | Initially enabled | Extends the scan through the complete directory tree below every selected root. |
-| Include groups without duplicates | Session | Initially disabled | Also shows single-file groups, useful when the session is being used as a collection inventory. |
+| Show single-file groups | Session view | Initially disabled | Filters the result tree without discarding data. Every scan and saved session retains single-file groups. |
 | Number of processing threads | Application | 1–64; initially 3 | Sets the number of workers used by every subsequently started scan. The best value depends on storage speed, processor capacity, memory, and the number of concurrent sessions. |
 | Visual theme | Application | Bundled VCL styles | Applies the selected appearance to the main window and open sessions and restores it at the next startup. |
 
@@ -797,7 +799,8 @@ An illustrative empty session:
   "criteria": {
     "paths": ["D:\\Photos"],
     "recursive": true,
-    "includeSingletons": false,
+    "includeSingletons": true,
+    "showSingletonGroups": false,
     "quality": 8,
     "pixelError": 0.08
   },
@@ -810,9 +813,11 @@ For each member, it stores path, dimensions, DPI, bytes, modification time, qual
 
 **scannedFiles** restores the processed-file count. It may include files whose decoding was attempted but failed; it is not merely the number of members in displayed groups.
 
+Every new scan retains all successfully decoded files, including groups with one member. `showSingletonGroups` records whether those groups are visible in the result tree. `includeSingletons` remains `true` in newly written files for compatibility with earlier releases.
+
 Compatibility behavior:
 
-- Missing includeSingletons means false.
+- If showSingletonGroups is missing, the legacy includeSingletons value supplies its initial visibility.
 - A legacy threadCount field is accepted and ignored; worker count is now an application setting.
 - If quality is missing, an older distance value is converted.
 - Several later metadata fields have default values.
@@ -820,11 +825,11 @@ Compatibility behavior:
 
 pixelError remains in the file format for compatibility; a new GUI scan uses the core's default threshold.
 
-Pixels, previews, and full DCT signatures are not saved. Images remain external. Moving or deleting them outside the application can make previews unavailable and leave stored information out of date. Loading a session does not fully revalidate every file. Local paths are stored in plain text.
+Pixels, previews, and full DCT signatures are not saved. Images remain external. Moving or deleting them outside the application can make previews unavailable and leave stored information out of date. Loading a session does not automatically touch every path; use **Revalidate files** to remove entries whose files no longer exist. Local paths are stored in plain text.
 
 ### Documents and closing
 
-The Main window manages New, Load, Save, Save as, About, and child-window layout. The first child window is maximized.
+The Main window manages New, Load, Save, Save as, About, and child-window layout. Its **Session** menu mirrors the active session toolbar, including scanning, reference and selection rules, file operations, options, export, revalidation, and the single-file-group filter. The first child window is maximized.
 
 Changes to a session trigger a save prompt when it closes. Closing the Main window coordinates sessions, cancellation, and operations still in progress.
 
@@ -1035,8 +1040,8 @@ Useful controlled examples include:
 - Hash distance zero: no implication of file identity.
 - Fully transparent pixels: equivalent to white in the current model.
 - A~B and B~C, but A not~C: no single group containing all three.
-- One file with includeSingletons enabled: visible group and reference.
-- Older session without includeSingletons: it loads as false.
+- One unmatched file: retained as a singleton and shown only when the view filter is enabled.
+- Older session without showSingletonGroups: visibility follows its legacy includeSingletons setting.
 
 This is a documented strategy, not a claim that all such tests are automated or were run while writing this README.
 

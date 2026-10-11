@@ -4,7 +4,7 @@ object OptionsForm: TOptionsForm
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Session options'
-  ClientHeight = 378
+  ClientHeight = 313
   ClientWidth = 500
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -13,7 +13,7 @@ object OptionsForm: TOptionsForm
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poOwnerFormCenter
-  StyleElements = [seFont, seClient, seBorder]
+  ShowHint = True
   TextHeight = 17
   object MatchingGroupBox: TGroupBox
     Left = 16
@@ -28,22 +28,22 @@ object OptionsForm: TOptionsForm
     object QualityLabel: TLabel
       Left = 20
       Top = 32
-      Width = 101
+      Width = 96
       Height = 17
       Caption = 'Matching quality'
       FocusControl = QualitySpin
     end
     object QualityDescriptionLabel: TLabel
       Left = 20
-      Top = 68
+      Top = 60
       Width = 422
-      Height = 42
+      Height = 62
       Anchors = [akLeft, akTop, akRight]
       AutoSize = False
-      Caption =
-        'Controls how closely images must resemble one another. Lower ' +
-        'values find more variations; higher values accept only closer ' +
-        'visual matches.'
+      Caption = 
+        'Controls how closely images must resemble one another. Lower val' +
+        'ues find more variations; higher values accept only closer visua' +
+        'l matches.'
       WordWrap = True
     end
     object QualitySpin: TSpinEdit
@@ -51,6 +51,10 @@ object OptionsForm: TOptionsForm
       Top = 27
       Width = 72
       Height = 27
+      Hint = 
+        'Set perceptual matching strictness from 0 to 10. Higher values r' +
+        'equire images to be more visually similar; 10 is the strictest s' +
+        'etting.'
       Anchors = [akTop, akRight]
       MaxValue = 10
       MinValue = 0
@@ -62,63 +66,47 @@ object OptionsForm: TOptionsForm
     Left = 16
     Top = 153
     Width = 468
-    Height = 160
+    Height = 106
     Caption = ' Search scope '
     TabOrder = 1
     DesignSize = (
       468
-      160)
+      106)
+    object RecursiveDescriptionLabel: TLabel
+      Left = 20
+      Top = 52
+      Width = 398
+      Height = 51
+      Anchors = [akLeft, akTop, akRight]
+      AutoSize = False
+      Caption = 'Scan every subfolder below each selected search folder.'
+      WordWrap = True
+    end
     object RecursiveCheck: TCheckBox
       Left = 20
-      Top = 28
+      Top = 24
       Width = 422
       Height = 22
+      Hint = 
+        'When enabled, scan every nested folder below each configured sea' +
+        'rch root.'
       Anchors = [akLeft, akTop, akRight]
       Caption = 'Include subfolders in the search'
       Checked = True
       State = cbChecked
       TabOrder = 0
     end
-    object RecursiveDescriptionLabel: TLabel
-      Left = 44
-      Top = 53
-      Width = 398
-      Height = 26
-      Anchors = [akLeft, akTop, akRight]
-      AutoSize = False
-      Caption = 'Scan every subfolder below each selected search folder.'
-      WordWrap = True
-    end
-    object IncludeSingletonsCheck: TCheckBox
-      Left = 20
-      Top = 88
-      Width = 422
-      Height = 22
-      Anchors = [akLeft, akTop, akRight]
-      Caption = 'Include groups without duplicates (single file)'
-      TabOrder = 1
-    end
-    object IncludeSingletonsDescriptionLabel: TLabel
-      Left = 44
-      Top = 113
-      Width = 398
-      Height = 34
-      Anchors = [akLeft, akTop, akRight]
-      AutoSize = False
-      Caption =
-        'Also show images that did not match any other file, as groups ' +
-        'containing one item.'
-      WordWrap = True
-    end
   end
   object ButtonsPanel: TPanel
     Left = 0
-    Top = 325
+    Top = 260
     Width = 500
     Height = 53
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitTop = 242
+    ExplicitWidth = 498
     DesignSize = (
       500
       53)
@@ -127,22 +115,26 @@ object OptionsForm: TOptionsForm
       Top = 12
       Width = 80
       Height = 29
+      Hint = 'Apply these options to the current session and close the dialog.'
       Anchors = [akTop, akRight]
       Caption = 'OK'
       Default = True
       ModalResult = 1
       TabOrder = 0
+      ExplicitLeft = 314
     end
     object CancelButton: TButton
       Left = 404
       Top = 12
       Width = 80
       Height = 29
+      Hint = 'Discard changes and close the dialog.'
       Anchors = [akTop, akRight]
       Cancel = True
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1
+      ExplicitLeft = 402
     end
   end
 end

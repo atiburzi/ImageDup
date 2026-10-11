@@ -15,7 +15,8 @@ function ApplicationMaxThreadCount: Integer;
 function LoadApplicationThreadCount: Integer;
 procedure LoadRecentSessionFiles(Destination: TStrings);
 procedure SaveRecentSessionFiles(const Source: TStrings);
-procedure SaveApplicationSettings(const StyleName: string; ThreadCount: Integer);
+procedure SaveApplicationSettings(const StyleName, LanguageCode: string;
+  ThreadCount: Integer);
 
 implementation
 
@@ -26,6 +27,7 @@ uses
 const
   SettingsRegistryKey = 'Software\ImageDup';
   StyleRegistryValue = 'GUIStyle';
+  LanguageRegistryValue = 'UILanguage';
   ThreadCountRegistryValue = 'ProcessingThreadCount';
   RecentSessionRegistryValuePrefix = 'RecentSession';
 
@@ -176,7 +178,7 @@ begin
   end;
 end;
 
-procedure SaveApplicationSettings(const StyleName: string;
+procedure SaveApplicationSettings(const StyleName, LanguageCode: string;
   ThreadCount: Integer);
 var
   Registry: TRegistry;
@@ -187,6 +189,7 @@ begin
     if not Registry.OpenKey(SettingsRegistryKey, True) then
       raise ERegistryException.CreateRes(@rsApplicationSettingsUnavailable);
     Registry.WriteString(StyleRegistryValue, StyleName);
+    Registry.WriteString(LanguageRegistryValue, LanguageCode);
     Registry.WriteInteger(ThreadCountRegistryValue, EnsureRange(ThreadCount,
       MinApplicationThreadCount, ApplicationMaxThreadCount));
   finally

@@ -4441,6 +4441,7 @@ object FormSession: TFormSession
     0080030000800300008003000080030000C0030000F8030000F8030000F80300
     00FC030000FFFF0000}
   Position = poDefault
+  ShowHint = True
   Visible = True
   ShowInTaskBar = True
   OnClose = FormClose
@@ -4452,10 +4453,11 @@ object FormSession: TFormSession
   TextHeight = 17
   object PreviewSplitter: TSplitter
     Left = 0
-    Top = 750
+    Top = 745
     Width = 1599
     Height = 6
     Cursor = crVSplit
+    Hint = 'Drag to resize the results list and image preview areas.'
     Align = alBottom
     AutoSnap = False
     MinSize = 1
@@ -4465,13 +4467,12 @@ object FormSession: TFormSession
   end
   object SetupPanel: TPanel
     Left = 0
-    Top = 48
+    Top = 40
     Width = 1599
     Height = 89
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitWidth = 1597
     DesignSize = (
       1599
       89)
@@ -4480,25 +4481,28 @@ object FormSession: TFormSession
       Top = -5
       Width = 227
       Height = 17
+      Hint = 'These folders are the search roots used when you start a scan.'
       Caption = 'Folders to compare (one path per line)'
       FocusControl = PathsMemo
     end
     object PathsMemo: TMemo
       Left = 16
       Top = 18
-      Width = 1450
+      Width = 1408
       Height = 66
+      Hint = 
+        'Enter or paste one folder per line. Every listed folder is scann' +
+        'ed when you start the search.'
       Anchors = [akLeft, akTop, akRight]
       ScrollBars = ssVertical
       TabOrder = 0
       WordWrap = False
       OnChange = PathsMemoChange
-      ExplicitWidth = 1448
     end
     object BrowseButton: TButton
-      Left = 1472
+      Left = 1430
       Top = 18
-      Width = 111
+      Width = 153
       Height = 66
       Action = ActionBrowse
       Anchors = [akTop, akRight]
@@ -4508,27 +4512,28 @@ object FormSession: TFormSession
       ImageMargins.Top = 5
       Images = DataModuleResources.VirtualImageList32
       TabOrder = 1
-      ExplicitLeft = 1470
     end
   end
   object ResultsPanel: TPanel
     Left = 0
-    Top = 137
+    Top = 129
     Width = 1599
-    Height = 613
+    Height = 616
     Align = alClient
     BevelOuter = bvNone
     Constraints.MinHeight = 150
     Padding.Left = 16
     Padding.Right = 16
     TabOrder = 1
-    ExplicitWidth = 1597
-    ExplicitHeight = 605
+    ExplicitHeight = 621
     object ResultsLabel: TLabel
       Left = 16
       Top = 0
       Width = 1567
       Height = 30
+      Hint = 
+        'Summarizes the current results and the number of scanned or visi' +
+        'ble image groups.'
       Align = alTop
       AutoSize = False
       Caption = 'Similar image groups - add folders and start the search'
@@ -4539,10 +4544,11 @@ object FormSession: TFormSession
       Left = 16
       Top = 30
       Width = 1567
-      Height = 583
+      Height = 586
       Hint = 
-        'Expand groups, select a file to compare it, and use the checkbox' +
-        ' to mark it.'
+        'Expand a group to inspect its files. Select a row to display the' +
+        ' group previews, and use each checkbox to mark files for batch a' +
+        'ctions.'
       Align = alClient
       DefaultNodeHeight = 21
       Header.AutoSizeIndex = 0
@@ -4569,6 +4575,7 @@ object FormSession: TFormSession
       OnNodeDblClick = ResultsTreeNodeDblClick
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
+      ExplicitHeight = 591
       Columns = <
         item
           Position = 0
@@ -4599,7 +4606,7 @@ object FormSession: TFormSession
   end
   object PreviewPanel: TPanel
     Left = 0
-    Top = 756
+    Top = 751
     Width = 1599
     Height = 362
     Align = alBottom
@@ -4613,13 +4620,16 @@ object FormSession: TFormSession
     ParentFont = False
     TabOrder = 2
     OnResize = PreviewPanelResize
-    ExplicitTop = 748
-    ExplicitWidth = 1597
+    ExplicitTop = 756
     object PreviewScroll: TScrollBox
       Left = 0
       Top = 0
       Width = 1599
       Height = 362
+      Hint = 
+        'Displays every image in the selected group. Click a preview to o' +
+        'pen the image viewer, or right-click it for file-specific comman' +
+        'ds.'
       HorzScrollBar.Visible = False
       VertScrollBar.Visible = False
       Align = alClient
@@ -4627,28 +4637,26 @@ object FormSession: TFormSession
       Color = clBtnFace
       ParentColor = False
       TabOrder = 0
-      ExplicitWidth = 1597
     end
   end
   object ToolBar: TToolBar
     Left = 0
     Top = 0
     Width = 1599
-    Height = 48
+    Height = 40
     Margins.Left = 4
     Margins.Top = 4
     Margins.Right = 4
     Margins.Bottom = 4
     AutoSize = True
-    ButtonHeight = 46
-    ButtonWidth = 145
+    ButtonHeight = 38
+    ButtonWidth = 139
     Caption = 'ToolBar'
     Flat = False
     Images = DataModuleResources.VirtualImageList32
     List = True
     AllowTextButtons = True
     TabOrder = 3
-    ExplicitWidth = 1597
     object ToolButtonNewSession: TToolButton
       Left = 0
       Top = 0
@@ -4686,14 +4694,16 @@ object FormSession: TFormSession
       Style = tbsTextButton
     end
     object ToolButtonSaveSession: TToolButton
-      Left = 0
+      Left = 253
       Top = 0
+      Hint = 
+        'Save the active .idup session, including its folders, options, r' +
+        'esults, references, and checked files.'
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
       Margins.Bottom = 4
       Caption = 'Save session'
-      Hint = 'Save the current search criteria and results'
       ImageIndex = 27
       ImageName = 'save'
       Style = tbsTextButton
@@ -4735,8 +4745,19 @@ object FormSession: TFormSession
       ImageIndex = 36
       Style = tbsTextButton
     end
-    object ToolButtonSep3: TToolButton
+    object ToolButtonRevalidateFiles: TToolButton
       Left = 616
+      Top = 0
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Action = ActionRevalidateFiles
+      Caption = 'Revalidate'
+      Style = tbsTextButton
+    end
+    object ToolButtonSep3: TToolButton
+      Left = 723
       Top = 0
       Width = 10
       Margins.Left = 4
@@ -4749,17 +4770,43 @@ object FormSession: TFormSession
       Style = tbsSeparator
     end
     object ToolButtonSelectionOptions: TToolButton
-      Left = 626
+      Left = 733
       Top = 0
+      Hint = 
+        'Apply a batch rule to references or checked files. Click the but' +
+        'ton to select every file except each group reference, or use the' +
+        ' arrow to choose another rule.'
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
       Margins.Bottom = 4
-      Action = ActionSelectionOptions
+      Caption = 'Select...'
+      DropdownMenu = SelectionMenu
+      Enabled = False
+      ImageIndex = 2
+      ImageName = 'check'
+      Style = tbsTextButton
+    end
+    object ToolButtonSelectAction: TToolButton
+      Left = 823
+      Top = 0
+      Hint = 
+        'Run an operation on the checked files. Click the button to move ' +
+        'them to the Recycle Bin, or use the arrow to choose another oper' +
+        'ation.'
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
+      Caption = 'Actions...'
+      DropdownMenu = FileOperationMenu
+      Enabled = False
+      ImageIndex = 43
+      ImageName = 'selection-actions'
       Style = tbsTextButton
     end
     object ToolButtonSep4: TToolButton
-      Left = 731
+      Left = 921
       Top = 0
       Width = 10
       Margins.Left = 4
@@ -4767,37 +4814,44 @@ object FormSession: TFormSession
       Margins.Right = 4
       Margins.Bottom = 4
       Caption = 'ToolButtonSep4'
-      ImageIndex = 10
-      ImageName = 'file-different'
+      ImageIndex = 18
+      ImageName = 'reference-highest-quality'
       Style = tbsSeparator
     end
-    object ToolButtonDeleteSelected: TToolButton
-      Left = 741
+    object ToolButtonShowSingletonGroups: TToolButton
+      Left = 931
+      Top = 0
+      Action = ActionShowSingletonGroups
+      Caption = 'Single files'
+      Style = tbsTextButton
+    end
+    object ToolButtonOptions: TToolButton
+      Left = 1040
       Top = 0
       Margins.Left = 4
       Margins.Top = 4
       Margins.Right = 4
       Margins.Bottom = 4
-      Action = ActionDeleteSelected
-      DropdownMenu = FileOperationMenu
-      ImageIndex = 5
-      Style = tbsDropDown
+      Action = ActionOptions
+      ImageIndex = 17
+      Style = tbsTextButton
     end
     object ToolButtonSep5: TToolButton
-      Left = 806
+      Left = 1133
       Top = 0
       Width = 10
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'ToolButtonSep5'
-      ImageIndex = 7
-      ImageName = 'errors'
       Style = tbsSeparator
     end
+    object ToolButtonExportExcel: TToolButton
+      Left = 1143
+      Top = 0
+      Action = ActionExportExcel
+      ImageIndex = 9
+      Style = tbsTextButton
+    end
     object ToolButtonErrorDetails: TToolButton
-      Left = 816
+      Left = 1286
       Top = 0
       Margins.Left = 4
       Margins.Top = 4
@@ -4808,49 +4862,21 @@ object FormSession: TFormSession
       Style = tbsTextButton
     end
     object ToolButtonSep6: TToolButton
-      Left = 944
+      Left = 1414
       Top = 0
       Width = 10
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
       Caption = 'ToolButtonSep6'
-      ImageIndex = 18
-      ImageName = 'reference-highest-quality'
       Style = tbsSeparator
-    end
-    object ToolButtonOptions: TToolButton
-      Left = 954
-      Top = 0
-      Margins.Left = 4
-      Margins.Top = 4
-      Margins.Right = 4
-      Margins.Bottom = 4
-      Action = ActionOptions
-      ImageIndex = 17
-      Style = tbsTextButton
-    end
-    object ToolButtonSep7: TToolButton
-      Left = 1047
-      Top = 0
-      Width = 10
-      Caption = 'ToolButtonSep7'
-      Style = tbsSeparator
-    end
-    object ToolButtonExportExcel: TToolButton
-      Left = 1057
-      Top = 0
-      Action = ActionExportExcel
-      ImageIndex = 9
-      Style = tbsTextButton
     end
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 1118
+    Top = 1113
     Width = 1599
-    Height = 19
+    Height = 24
+    Hint = 
+      'Shows the current operation, scan and result counts, checked fil' +
+      'e count, total checked size, and progress when applicable.'
     Panels = <
       item
         Text = 'Ready'
@@ -4860,8 +4886,7 @@ object FormSession: TFormSession
         Style = psOwnerDraw
         Width = 280
       end>
-    ExplicitTop = 1110
-    ExplicitWidth = 1597
+    ExplicitTop = 1115
   end
   object StatusProgress: TProgressBar
     Left = 1416
@@ -4966,6 +4991,9 @@ object FormSession: TFormSession
     end
     object SetReferenceItem: TMenuItem
       Caption = 'Set reference'
+      Hint = 
+        'Choose how the reference image is selected independently in ever' +
+        'y group.'
       object ReferenceHighestQualityItem: TMenuItem
         Action = ActionReferenceHighestQuality
         ImageIndex = 18
@@ -5042,7 +5070,9 @@ object FormSession: TFormSession
     Top = 552
     object ActionNewSession: TAction
       Caption = 'New session'
-      Hint = 'Start a new search session'
+      Hint = 
+        'Create a blank session where you can choose folders and run an i' +
+        'ndependent duplicate-image search.'
       ImageIndex = 13
       ImageName = 'new'
       Visible = False
@@ -5050,7 +5080,9 @@ object FormSession: TFormSession
     end
     object ActionLoadSession: TAction
       Caption = 'Load session'
-      Hint = 'Load a saved session from disk'
+      Hint = 
+        'Open an .idup session file with its folders, options, results, r' +
+        'eferences, and checked files.'
       ImageIndex = 12
       ImageName = 'load'
       Visible = False
@@ -5058,7 +5090,9 @@ object FormSession: TFormSession
     end
     object ActionBrowse: TAction
       Caption = 'Add folder...'
-      Hint = 'Add a folder to the search'
+      Hint = 
+        'Select one or more folders and add them as search roots, one fol' +
+        'der per line.'
       ImageIndex = 1
       ImageName = 'add'
       OnExecute = ActionBrowseExecute
@@ -5066,7 +5100,9 @@ object FormSession: TFormSession
     object ActionStartScan: TAction
       Caption = 'Start search'
       Enabled = False
-      Hint = 'Start searching for duplicate images'
+      Hint = 
+        'Scan the configured folders, compare supported images perceptual' +
+        'ly, and build groups using the current session options.'
       ImageIndex = 31
       ImageName = 'start'
       OnExecute = ActionStartScanExecute
@@ -5074,7 +5110,9 @@ object FormSession: TFormSession
     object ActionStopScan: TAction
       Caption = 'Stop'
       Enabled = False
-      Hint = 'Stop the current search'
+      Hint = 
+        'Request cancellation of the running scan. Results already proces' +
+        'sed remain available after the worker stops.'
       ImageIndex = 32
       ImageName = 'stop'
       OnExecute = ActionStopScanExecute
@@ -5082,7 +5120,9 @@ object FormSession: TFormSession
     object ActionShowErrors: TAction
       Caption = 'Error details...'
       Enabled = False
-      Hint = 'Show image read errors'
+      Hint = 
+        'Open the list of files that could not be read, moved, recycled, ' +
+        'or otherwise processed.'
       ImageIndex = 6
       ImageName = 'errors'
       OnExecute = ActionShowErrorsExecute
@@ -5090,7 +5130,9 @@ object FormSession: TFormSession
     object ActionDeleteSelected: TAction
       Caption = 'Move to Recycle Bin...'
       Enabled = False
-      Hint = 'Move the selected files to the Windows Recycle Bin'
+      Hint = 
+        'Move every checked file to the Windows Recycle Bin. Successfully' +
+        ' moved files are removed from this session.'
       ImageIndex = 4
       ImageName = 'delete'
       OnExecute = ActionDeleteSelectedExecute
@@ -5098,7 +5140,9 @@ object FormSession: TFormSession
     object ActionMoveSelected: TAction
       Caption = 'Move to a folder...'
       Enabled = False
-      Hint = 'Move selected files while preserving their folder structure'
+      Hint = 
+        'Move every checked file to another folder while preserving its p' +
+        'ath relative to the common search root.'
       ImageIndex = 33
       ImageName = 'move-folder'
       OnExecute = ActionMoveSelectedExecute
@@ -5106,29 +5150,25 @@ object FormSession: TFormSession
     object ActionOptions: TAction
       Caption = 'Options'
       Hint = 
-        'Configure matching quality, processing threads, and subfolder se' +
-        'arch'
+        'Configure this session'#39's perceptual matching quality and whether' +
+        ' subfolders are included in scans.'
       ImageIndex = 14
       ImageName = 'options'
       OnExecute = ActionOptionsExecute
     end
-    object ActionSelectionOptions: TAction
-      Caption = 'Selections'
-      Enabled = False
-      Hint = 'Open automatic selection options'
-      ImageIndex = 2
-      ImageName = 'check'
-      OnExecute = ActionSelectionOptionsExecute
-    end
     object ActionNewSessionFromFolder: TAction
       Caption = 'Open a new session from this folder...'
-      Hint = 'Create a new session using the folder containing this image'
+      Hint = 
+        'Create a separate session whose search root is the folder contai' +
+        'ning this image.'
       Visible = False
       OnExecute = ActionNewSessionFromFolderExecute
     end
     object ActionOpenInExplorer: TAction
       Caption = 'Show in File Explorer'
-      Hint = 'Open File Explorer and select this file'
+      Hint = 
+        'Open Windows File Explorer at this image'#39's folder and select the' +
+        ' file.'
       ImageIndex = 25
       ImageName = 'search'
       Visible = False
@@ -5136,7 +5176,9 @@ object FormSession: TFormSession
     end
     object ActionSetCurrentAsReference: TAction
       Caption = 'Set this file as reference'
-      Hint = 'Use the selected file as the reference for its group'
+      Hint = 
+        'Make this image the reference for its group. Identity and simila' +
+        'rity indicators are then evaluated against it.'
       ImageIndex = 10
       ImageName = 'file-reference'
       Visible = False
@@ -5144,72 +5186,108 @@ object FormSession: TFormSession
     end
     object ActionReferenceHighestQuality: TAction
       Caption = 'Highest quality'
+      Hint = 
+        'Use the image with the highest computed quality score as the ref' +
+        'erence in every group.'
       ImageIndex = 15
       ImageName = 'reference-highest-quality'
       OnExecute = ActionReferenceHighestQualityExecute
     end
     object ActionReferenceHighestResolution: TAction
       Caption = 'Highest resolution'
+      Hint = 
+        'Use the image with the greatest pixel count as the reference in ' +
+        'every group.'
       ImageIndex = 16
       ImageName = 'reference-highest-resolution'
       OnExecute = ActionReferenceHighestResolutionExecute
     end
     object ActionReferenceLargestFile: TAction
       Caption = 'Largest file size'
+      Hint = 
+        'Use the image with the largest file size as the reference in eve' +
+        'ry group.'
       ImageIndex = 17
       ImageName = 'reference-largest-file'
       OnExecute = ActionReferenceLargestFileExecute
     end
     object ActionReferenceNewest: TAction
       Caption = 'Newest file'
+      Hint = 
+        'Use the most recently modified file as the reference in every gr' +
+        'oup.'
       ImageIndex = 20
       ImageName = 'reference-newest'
       OnExecute = ActionReferenceNewestExecute
     end
     object ActionReferenceLowestQuality: TAction
       Caption = 'Lowest quality'
+      Hint = 
+        'Use the image with the lowest computed quality score as the refe' +
+        'rence in every group.'
       ImageIndex = 18
       ImageName = 'reference-lowest-quality'
       OnExecute = ActionReferenceLowestQualityExecute
     end
     object ActionReferenceLowestResolution: TAction
       Caption = 'Lowest resolution'
+      Hint = 
+        'Use the image with the smallest pixel count as the reference in ' +
+        'every group.'
       ImageIndex = 19
       ImageName = 'reference-lowest-resolution'
       OnExecute = ActionReferenceLowestResolutionExecute
     end
     object ActionReferenceSmallestFile: TAction
       Caption = 'Smallest file size'
+      Hint = 
+        'Use the image with the smallest file size as the reference in ev' +
+        'ery group.'
       ImageIndex = 22
       ImageName = 'reference-smallest-file'
       OnExecute = ActionReferenceSmallestFileExecute
     end
     object ActionReferenceOldest: TAction
       Caption = 'Oldest file'
+      Hint = 
+        'Use the least recently modified file as the reference in every g' +
+        'roup.'
       ImageIndex = 21
       ImageName = 'reference-oldest'
       OnExecute = ActionReferenceOldestExecute
     end
     object ActionSelectAllExceptReference: TAction
       Caption = 'Select all files except the reference'
+      Hint = 
+        'Clear previous checks, then check every file in each group excep' +
+        't its reference.'
       ImageIndex = 26
       ImageName = 'select-all-except-reference'
       OnExecute = ActionSelectAllExceptReferenceExecute
     end
     object ActionSelectIdenticalToReference: TAction
       Caption = 'Select files identical to the reference'
+      Hint = 
+        'Clear previous checks, then check every file classified as ident' +
+        'ical to its group reference.'
       ImageIndex = 28
       ImageName = 'select-identical-reference'
       OnExecute = ActionSelectIdenticalToReferenceExecute
     end
     object ActionSelectDifferentFromReference: TAction
       Caption = 'Select files different from the reference'
+      Hint = 
+        'Clear previous checks, then check non-reference files that diffe' +
+        'r from their group reference.'
       ImageIndex = 27
       ImageName = 'select-different-reference'
       OnExecute = ActionSelectDifferentFromReferenceExecute
     end
     object ActionSelectOtherGroupsSameFolder: TAction
       Caption = 'Select files in other groups from the same folder'
+      Hint = 
+        'Clear previous checks, then check files in other groups that are' +
+        ' stored in the same folder as the current file.'
       ImageIndex = 30
       ImageName = 'select-other-groups-same-folder'
       Visible = False
@@ -5217,6 +5295,9 @@ object FormSession: TFormSession
     end
     object ActionSelectOtherGroupsDifferentFolder: TAction
       Caption = 'Select files in other groups from different folders'
+      Hint = 
+        'Clear previous checks, then check files in other groups that are' +
+        ' stored outside the current file'#39's folder.'
       ImageIndex = 29
       ImageName = 'select-other-groups-different-folder'
       Visible = False
@@ -5224,12 +5305,18 @@ object FormSession: TFormSession
     end
     object ActionEnsureUnselected: TAction
       Caption = 'Keep at least one file unselected in each group'
+      Hint = 
+        'If every file in a group is checked, uncheck its reference so at' +
+        ' least one file is kept.'
       ImageIndex = 5
       ImageName = 'ensure-unselected'
       OnExecute = ActionEnsureUnselectedExecute
     end
     object ActionClearSelections: TAction
       Caption = 'Clear all selections'
+      Hint = 
+        'Remove every check mark without changing files, groups, or refer' +
+        'ences.'
       ImageIndex = 3
       ImageName = 'clear-selections'
       OnExecute = ActionClearSelectionsExecute
@@ -5237,14 +5324,38 @@ object FormSession: TFormSession
     object ActionExportExcel: TAction
       Caption = 'Export to Excel...'
       Enabled = False
-      Hint = 'Export the grouped results to an Excel workbook'
+      Hint = 
+        'Export the groups and file metadata, including separate file nam' +
+        'e and path columns, to an .xlsx workbook.'
       ImageIndex = 7
       ImageName = 'export-excel'
       OnExecute = ActionExportExcelExecute
     end
+    object ActionRevalidateFiles: TAction
+      Caption = 'Revalidate files'
+      Enabled = False
+      Hint = 
+        'Check every session file on disk and remove entries whose files ' +
+        'no longer exist. Files on disk are never deleted.'
+      ImageIndex = 41
+      ImageName = 'revalidate-session'
+      OnExecute = ActionRevalidateFilesExecute
+    end
+    object ActionShowSingletonGroups: TAction
+      Caption = 'Show single-file groups'
+      Enabled = False
+      Hint = 
+        'Show or hide groups containing only one image. This display filt' +
+        'er is stored in the .idup session.'
+      ImageIndex = 42
+      ImageName = 'show-singletons'
+      OnExecute = ActionShowSingletonGroupsExecute
+    end
     object ActionAbout: TAction
       Caption = 'About...'
-      Hint = 'Show information about ImageDup'
+      Hint = 
+        'Show ImageDup version, project, license, and application informa' +
+        'tion.'
       ImageIndex = 0
       ImageName = 'about'
       Visible = False

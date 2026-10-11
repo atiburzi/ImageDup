@@ -21,7 +21,6 @@ type
   private
     FRoots: TArray<string>;
     FRecursive: Boolean;
-    FIncludeSingletons: Boolean;
     FDistance: Integer;
     FPixelError: Double;
     FThreadCount: Integer;
@@ -36,7 +35,7 @@ type
     procedure Execute; override;
   public
     constructor Create(const Roots: TArray<string>; Recursive: Boolean;
-      Distance: Integer; PixelError: Double; ThreadCount: Integer = 3; IncludeSingletons: Boolean = False);
+      Distance: Integer; PixelError: Double; ThreadCount: Integer = 3);
     destructor Destroy; override;
     function Drain: TScanUpdate;
     property ThreadCount: Integer read FThreadCount;
@@ -211,13 +210,12 @@ begin
 end;
 
 constructor TImageScan.Create(const Roots: TArray<string>; Recursive: Boolean;
-  Distance: Integer; PixelError: Double; ThreadCount: Integer; IncludeSingletons: Boolean);
+  Distance: Integer; PixelError: Double; ThreadCount: Integer);
 begin
   inherited Create(True);
   FreeOnTerminate := False;
   FRoots := Copy(Roots);
   FRecursive := Recursive;
-  FIncludeSingletons := IncludeSingletons;
   FDistance := Distance;
   FPixelError := PixelError;
   FThreadCount := EnsureRange(ThreadCount, 1, 64);
@@ -435,7 +433,7 @@ begin
             FDistance, FPixelError, Metrics) then Accepted.Add(J, Metrics);
         end;
         if Terminated then Break;
-        GroupId := Builder.Add(Entry.Info, Accepted, FIncludeSingletons);
+        GroupId := Builder.Add(Entry.Info, Accepted);
         Entries.Add(Entry);
         if GroupId >= 0 then
         begin
@@ -452,18 +450,9 @@ begin
           TMonitor.Enter(FLock);
           try
             FPending.Add(Group);
-            if FIncludeSingletons then
-            begin
-              if Length(Group.Members) = 1 then
-                Inc(FState.GroupCount);
-              Inc(FState.GroupedFiles);
-            end
-            else if Length(Group.Members) = 2 then
-            begin
+            if Length(Group.Members) = 1 then
               Inc(FState.GroupCount);
-              Inc(FState.GroupedFiles, 2);
-            end
-            else Inc(FState.GroupedFiles);
+            Inc(FState.GroupedFiles);
           finally
             TMonitor.Exit(FLock);
           end;

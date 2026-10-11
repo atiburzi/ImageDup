@@ -116,9 +116,10 @@ type
     ActionShowErrors: TAction;
     ActionDeleteSelected: TAction;
     ActionMoveSelected: TAction;
-    ActionSelectionOptions: TAction;
     ActionOptions: TAction;
     ActionExportExcel: TAction;
+    ActionRevalidateFiles: TAction;
+    ActionShowSingletonGroups: TAction;
     ActionAbout: TAction;
     ActionSetCurrentAsReference: TAction;
     ActionOpenInExplorer: TAction;
@@ -148,14 +149,15 @@ type
     ToolButtonSelectionOptions: TToolButton;
     ToolButtonSep3: TToolButton;
     ToolButtonStopSearch: TToolButton;
-    ToolButtonSep4: TToolButton;
-    ToolButtonDeleteSelected: TToolButton;
-    ToolButtonSep5: TToolButton;
+    ToolButtonSelectAction: TToolButton;
     ToolButtonErrorDetails: TToolButton;
     ToolButtonOptions: TToolButton;
-    ToolButtonSep6: TToolButton;
-    ToolButtonSep7: TToolButton;
+    ToolButtonSep4: TToolButton;
+    ToolButtonSep5: TToolButton;
     ToolButtonExportExcel: TToolButton;
+    ToolButtonRevalidateFiles: TToolButton;
+    ToolButtonSep6: TToolButton;
+    ToolButtonShowSingletonGroups: TToolButton;
     StatusBar: TStatusBar;
     StatusProgress: TProgressBar;
     procedure FormCreate(Sender: TObject);
@@ -192,7 +194,6 @@ type
     procedure FullSizeImageMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure FullSizeImageMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure FullSizeImageMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure ActionSelectionOptionsExecute(Sender: TObject);
     procedure ActionDeleteSelectedExecute(Sender: TObject);
     procedure ActionMoveSelectedExecute(Sender: TObject);
     procedure ActionSetCurrentAsReferenceExecute(Sender: TObject);
@@ -219,6 +220,8 @@ type
     procedure ActionLoadSessionExecute(Sender: TObject);
     procedure ActionOptionsExecute(Sender: TObject);
     procedure ActionExportExcelExecute(Sender: TObject);
+    procedure ActionRevalidateFilesExecute(Sender: TObject);
+    procedure ActionShowSingletonGroupsExecute(Sender: TObject);
     procedure ActionAboutExecute(Sender: TObject);
   private
     FWorker: TImageScan;
@@ -241,13 +244,24 @@ type
     FScannedFileCount: Integer;
     FStatusMessage: string;
     FSelectionContextFileName: string;
+    FSelectionMenuHasFileContext: Boolean;
     FSessionFileName: string;
     FComparisonQuality: Integer;
     FRecursiveSearch: Boolean;
-    FIncludeSingletons: Boolean;
+    FShowSingletonGroups: Boolean;
+    FLongOperationDepth: Integer;
+    FPreviousCursor: TCursor;
+    procedure BeginLongOperation;
+    procedure EndLongOperation;
+    procedure SetShowSingletonGroups(Value: Boolean);
     procedure RefreshActionStates;
     function HasSearchRoots: Boolean;
     function HasSessionContent: Boolean;
+    function GroupIsVisible(const Group: TImageGroup): Boolean;
+    function VisibleGroupOrdinal(GroupIndex: Integer): Integer;
+    function VisibleGroupCount: Integer;
+    function VisibleFileCount: Integer;
+    procedure UpdateResultsCaption;
     procedure BuildTree(CaptureCurrent: Boolean = True; const FocusFileOverride: string = '');
     procedure CaptureChecks;
     function FocusedFileName: string;
@@ -281,12 +295,11 @@ type
     procedure InitializeStatusBar;
     procedure SetProgressVisible(Value: Boolean);
     procedure UpdateStatusBarLayout;
-    procedure RemoveRecycledFiles(const FileNames: TArray<string>);
+    procedure RemoveFilesFromSession(const FileNames: TArray<string>);
     function SelectedFiles: TArray<string>;
     procedure UpdateMovedFiles(const MovedFiles: TDictionary<string, string>);
   public
-    procedure SetSearchOptions(AQuality: Integer; ARecursive: Boolean;
-      AIncludeSingletons: Boolean = False);
+    procedure SetSearchOptions(AQuality: Integer; ARecursive: Boolean);
     property Worker: TImageScan read FWorker;
     property ScannedFileCount: Integer read FScannedFileCount;
     property SelectedFileBytes: Int64 read CheckedFileBytes;
@@ -303,12 +316,14 @@ type
     procedure ExportResultsToFile(const FileName: string);
     procedure SetReferenceFile(const FileName: string);
     procedure InitializeUntitled(const ACaption: string);
+    procedure InitializeSearchFolder(const Folder: string);
     procedure LoadDocument(const FileName: string);
     procedure SaveDocument(const FileName: string);
     function CanSaveDocument: Boolean;
     function IsBusy: Boolean;
     function PrepareForClose: Boolean;
     procedure CancelPreparedClose;
+    procedure ShowApplicationHint(const Value: string);
     property Modified: Boolean read FModified;
     property SessionFileName: string read FSessionFileName;
   end;
@@ -368,6 +383,9 @@ resourcestring
   rsRecycleConfirmFmt='Move the %d selected files to the Windows Recycle Bin?';
   rsMovingToRecycleBinFmt='Moving to the Recycle Bin: %s';
   rsResultsUpdatedFmt='Results updated - %d groups, %d files.';
+  rsRevalidationAllFilesAvailable='Revalidation completed - all session files are still available.';
+  rsRevalidationRemovedOne='Revalidation completed - 1 missing file removed from the session.';
+  rsRevalidationRemovedFmt='Revalidation completed - %d missing files removed from the session.';
   rsRecycleSummaryFmt='In the Recycle Bin: %d | Not moved: %d';
   rsRecycleFailuresFmt='%d files could not be moved and remain selected.%sSee Error details for the reasons.';
   rsMoveFolderDialogTitle='Move selected files to a folder';
@@ -621,6 +639,7 @@ begin
   FPreviewMemberCount := 0;
   FSortColumn := -1;
   FSortAscending := True;
+  SetShowSingletonGroups(False);
   SetSearchOptions(8, True);
   ZoomCursor := LoadCursor(HInstance, PChar(ZoomInCursorResource));
   if ZoomCursor = 0 then
@@ -670,6 +689,32 @@ begin
 //    AddPngResource(FTreeImages, TreeResourceDifferent);
 //  end;
 //  ResultsTree.Images := FTreeImages;
+end;
+
+procedure TFormSession.SetShowSingletonGroups(Value: Boolean);
+begin
+  FShowSingletonGroups := Value;
+  ActionShowSingletonGroups.Checked := Value;
+  ToolButtonShowSingletonGroups.Down := Value;
+end;
+
+procedure TFormSession.BeginLongOperation;
+begin
+  Inc(FLongOperationDepth);
+  if FLongOperationDepth = 1 then
+  begin
+    FPreviousCursor := Screen.Cursor;
+    Screen.Cursor := crHourGlass;
+  end;
+end;
+
+procedure TFormSession.EndLongOperation;
+begin
+  if FLongOperationDepth <= 0 then
+    Exit;
+  Dec(FLongOperationDepth);
+  if FLongOperationDepth = 0 then
+    Screen.Cursor := FPreviousCursor;
 end;
 
 function TFormSession.CheckedFileBytes: Int64;
@@ -729,6 +774,16 @@ procedure TFormSession.SetStatusMessage(const Value: string);
 begin
   FStatusMessage := Value;
   UpdateCheckedSizeStatus;
+end;
+
+procedure TFormSession.ShowApplicationHint(const Value: string);
+begin
+  if not Assigned(StatusBar) or (StatusBar.Panels.Count = 0) then
+    Exit;
+  if Value <> '' then
+    StatusBar.Panels[0].Text := Value
+  else
+    UpdateCheckedSizeStatus;
 end;
 
 procedure TFormSession.SetModified(Value: Boolean);
@@ -852,9 +907,56 @@ begin
     (Assigned(FErrors) and (FErrors.Count > 0)) or HasCheckedFiles;
 end;
 
+function TFormSession.GroupIsVisible(const Group: TImageGroup): Boolean;
+begin
+  Result := FShowSingletonGroups or (Length(Group.Members) > 1);
+end;
+
+function TFormSession.VisibleGroupOrdinal(GroupIndex: Integer): Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  if not Assigned(FGroups) then
+    Exit;
+  for I := 0 to Min(GroupIndex, FGroups.Count - 1) do
+    if GroupIsVisible(FGroups[I]) then
+      Inc(Result);
+end;
+
+function TFormSession.VisibleGroupCount: Integer;
+var
+  Group: TImageGroup;
+begin
+  Result := 0;
+  if not Assigned(FGroups) then
+    Exit;
+  for Group in FGroups do
+    if GroupIsVisible(Group) then
+      Inc(Result);
+end;
+
+function TFormSession.VisibleFileCount: Integer;
+var
+  Group: TImageGroup;
+begin
+  Result := 0;
+  if not Assigned(FGroups) then
+    Exit;
+  for Group in FGroups do
+    if GroupIsVisible(Group) then
+      Inc(Result, Length(Group.Members));
+end;
+
+procedure TFormSession.UpdateResultsCaption;
+begin
+  ResultsLabel.Caption := Format(rsResultsUpdatedFmt,
+    [VisibleGroupCount, VisibleFileCount]);
+end;
+
 procedure TFormSession.RefreshActionStates;
 var
-  Busy, CanStop, HasGroups, HasSelection, HasRoots, ContextValid,
+  Busy, CanStop, HasErrors, HasGroups, HasSelection, HasRoots, ContextValid,
     ContextIsReference: Boolean;
   ContextGroup, ContextMember: Integer;
 begin
@@ -862,6 +964,7 @@ begin
   HasRoots := HasSearchRoots;
   HasGroups := Assigned(FGroups) and (FGroups.Count > 0);
   HasSelection := HasCheckedFiles;
+  HasErrors := Assigned(FErrors) and (FErrors.Count > 0);
   CanStop := Assigned(FWorker) and (not FDeleting) and (not FStopping);
   ContextValid := ResolveSelectionContext(ContextGroup, ContextMember);
   ContextIsReference := ContextValid and
@@ -875,13 +978,21 @@ begin
   ActionAbout.Enabled := not FDeleting;
   ActionStartScan.Enabled := (not Busy) and HasRoots;
   ActionStopScan.Enabled := CanStop;
+  ToolButtonStartSearch.Visible := not Assigned(FWorker);
+  ToolButtonStopSearch.Visible := Assigned(FWorker);
   ActionLoadSession.Enabled := not Busy;
   ActionNewSession.Enabled := not Busy;
-  ActionShowErrors.Enabled := (not Busy) and Assigned(FErrors) and
-    (FErrors.Count > 0);
-  ActionSelectionOptions.Enabled := (not Busy) and HasGroups;
+  ActionShowErrors.Visible := HasErrors;
+  ActionShowErrors.Enabled := (not Busy) and HasErrors;
+  ToolButtonErrorDetails.Visible := HasErrors;
+//  ToolButtonSep6.Visible := HasErrors;
+  ToolButtonSelectionOptions.Enabled := (not Busy) and HasGroups;
+  ToolButtonSelectAction.Enabled := (not Busy) and HasSelection;
   ActionDeleteSelected.Enabled := (not Busy) and HasSelection;
   ActionMoveSelected.Enabled := (not Busy) and HasSelection;
+  ActionRevalidateFiles.Enabled := (not Busy) and HasGroups;
+  ActionShowSingletonGroups.Enabled := (not Busy) and HasGroups;
+  SetShowSingletonGroups(FShowSingletonGroups);
 
   ActionSetCurrentAsReference.Visible := ContextValid;
   ActionSetCurrentAsReference.Enabled := (not Busy) and ContextValid and
@@ -933,7 +1044,7 @@ begin
 end;
 
 procedure TFormSession.SetSearchOptions(AQuality: Integer;
-  ARecursive: Boolean; AIncludeSingletons: Boolean);
+  ARecursive: Boolean);
 var
   NewQuality: Integer;
   Changed: Boolean;
@@ -941,10 +1052,9 @@ begin
   NewQuality := EnsureRange(AQuality, MinComparisonQuality,
     MaxComparisonQuality);
   Changed := (FComparisonQuality <> NewQuality) or
-    (FRecursiveSearch <> ARecursive) or (FIncludeSingletons <> AIncludeSingletons);
+    (FRecursiveSearch <> ARecursive);
   FComparisonQuality := NewQuality;
   FRecursiveSearch := ARecursive;
-  FIncludeSingletons := AIncludeSingletons;
   if Changed then
     SetModified(True);
 end;
@@ -952,15 +1062,183 @@ end;
 procedure TFormSession.ActionOptionsExecute(Sender: TObject);
 var
   Quality: Integer;
-  Recursive, IncludeSingletons: Boolean;
+  Recursive: Boolean;
 begin
   Quality := FComparisonQuality;
   Recursive := FRecursiveSearch;
-  IncludeSingletons := FIncludeSingletons;
-  if TOptionsForm.Execute(Self, Quality, Recursive, IncludeSingletons) then
+  if TOptionsForm.Execute(Self, Quality, Recursive) then
   begin
-    SetSearchOptions(Quality, Recursive, IncludeSingletons);
+    SetSearchOptions(Quality, Recursive);
     SetStatusMessage(rsOptionsUpdated);
+  end;
+end;
+
+procedure TFormSession.ActionRevalidateFilesExecute(Sender: TObject);
+var
+  MissingFiles: TList<string>;
+  KnownMissing: TDictionary<string, Boolean>;
+  Group: TImageGroup;
+  Member: TGroupMember;
+begin
+  if Assigned(FWorker) or FDeleting or not Assigned(FGroups) then
+    Exit;
+  MissingFiles := TList<string>.Create;
+  KnownMissing := TDictionary<string, Boolean>.Create;
+  BeginLongOperation;
+  FDeleting := True;
+  ResultsTree.Enabled := False;
+  CloseFullSize(False);
+  RefreshActionStates;
+  try
+    CaptureChecks;
+    for Group in FGroups do
+      for Member in Group.Members do
+        if not FileExists(Member.Info.FileName) and
+          not KnownMissing.ContainsKey(Member.Info.FileName) then
+        begin
+          KnownMissing.Add(Member.Info.FileName, True);
+          MissingFiles.Add(Member.Info.FileName);
+        end;
+    if MissingFiles.Count = 0 then
+      SetStatusMessage(rsRevalidationAllFilesAvailable)
+    else
+    begin
+      RemoveFilesFromSession(MissingFiles.ToArray);
+      UpdateResultsCaption;
+      if MissingFiles.Count = 1 then
+        SetStatusMessage(rsRevalidationRemovedOne)
+      else
+        SetStatusMessage(Format(rsRevalidationRemovedFmt,
+          [MissingFiles.Count]));
+    end;
+  finally
+    try
+      ResultsTree.Enabled := True;
+      FDeleting := False;
+      KnownMissing.Free;
+      MissingFiles.Free;
+      RefreshActionStates;
+    finally
+      EndLongOperation;
+    end;
+  end;
+end;
+
+procedure TFormSession.ActionShowSingletonGroupsExecute(Sender: TObject);
+var
+  Node, TargetNode: PVirtualNode;
+  Data: PNodeData;
+  CurrentKind: TNodeKind;
+  CurrentGroup, CurrentMember, TargetGroup, TargetGroupId: Integer;
+  Offset, Candidate, TargetMember: Integer;
+  TargetFile: string;
+begin
+  if Assigned(FWorker) or FDeleting then
+    Exit;
+
+  BeginLongOperation;
+  try
+    CurrentGroup := -1;
+    CurrentMember := -1;
+    CurrentKind := nkGroup;
+    Node := ResultsTree.FocusedNode;
+    if Assigned(Node) then
+    begin
+      Data := ResultsTree.GetNodeData(Node);
+      if Assigned(Data) and (Data.GroupIndex >= 0) and
+        (Data.GroupIndex < FGroups.Count) then
+      begin
+        CurrentKind := Data.Kind;
+        CurrentGroup := Data.GroupIndex;
+        CurrentMember := Data.MemberIndex;
+      end;
+    end;
+
+    // tbsTextButton does not own a check state: the session flag is the
+    // source of truth and Down is its visual representation.
+    SetShowSingletonGroups(not FShowSingletonGroups);
+    TargetGroup := -1;
+    if (CurrentGroup >= 0) and GroupIsVisible(FGroups[CurrentGroup]) then
+      TargetGroup := CurrentGroup
+    else if CurrentGroup >= 0 then
+      for Offset := 1 to FGroups.Count do
+      begin
+        Candidate := CurrentGroup + Offset;
+        if (Candidate < FGroups.Count) and
+          GroupIsVisible(FGroups[Candidate]) then
+        begin
+          TargetGroup := Candidate;
+          Break;
+        end;
+        Candidate := CurrentGroup - Offset;
+        if (Candidate >= 0) and GroupIsVisible(FGroups[Candidate]) then
+        begin
+          TargetGroup := Candidate;
+          Break;
+        end;
+      end;
+
+    TargetFile := '';
+    TargetGroupId := -1;
+    if TargetGroup >= 0 then
+    begin
+      TargetGroupId := FGroups[TargetGroup].Id;
+      if CurrentKind = nkFile then
+      begin
+        TargetMember := EnsureRange(CurrentMember, 0,
+          High(FGroups[TargetGroup].Members));
+        TargetFile := FGroups[TargetGroup].Members[TargetMember].Info.FileName;
+      end;
+    end;
+
+    if FSortColumn = 0 then
+      SortGroupsBySize(FSortAscending)
+    else if FSortColumn > 0 then
+      SortMembers(FSortColumn, FSortAscending);
+    ClearPreviews;
+    BuildTree(True, TargetFile);
+
+    if (TargetGroupId >= 0) and (CurrentKind = nkGroup) then
+    begin
+      TargetNode := nil;
+      Node := ResultsTree.GetFirst;
+      while Assigned(Node) do
+      begin
+        Data := ResultsTree.GetNodeData(Node);
+        if Assigned(Data) and (Data.Kind = nkGroup) and
+          (Data.GroupIndex >= 0) and (Data.GroupIndex < FGroups.Count) and
+          (FGroups[Data.GroupIndex].Id = TargetGroupId) then
+        begin
+          TargetNode := Node;
+          Break;
+        end;
+        Node := ResultsTree.GetNext(Node);
+      end;
+      if Assigned(TargetNode) then
+      begin
+        ResultsTree.ClearSelection;
+        ResultsTree.FocusedNode := TargetNode;
+        ResultsTree.Selected[TargetNode] := True;
+        ResultsTree.ScrollIntoView(TargetNode, False);
+      end;
+    end
+    else if TargetGroupId < 0 then
+    begin
+      ResultsTree.ClearSelection;
+      ResultsTree.FocusedNode := nil;
+    end;
+
+    if Assigned(ResultsTree.FocusedNode) then
+      ShowNode(ResultsTree.FocusedNode)
+    else
+    begin
+      FSelectedGroup := -1;
+      FSelectedMember := -1;
+    end;
+    UpdateResultsCaption;
+    SetModified(True);
+  finally
+    EndLongOperation;
   end;
 end;
 
@@ -974,14 +1252,19 @@ procedure TFormSession.ActionExportExcelExecute(Sender: TObject);
 begin
   if not ExportExcelDialog.Execute(Handle) then
     Exit;
+  BeginLongOperation;
   try
-    ExportResultsToFile(ExportExcelDialog.FileName);
-    SetStatusMessage(Format(rsExcelExportCompletedFmt,
-      [ExportExcelDialog.FileName]));
-  except
-    on E: Exception do
-      MessageDlg(Format(rsExcelExportErrorFmt, [sLineBreak, E.Message]),
-        mtError, [mbOK], 0);
+    try
+      ExportResultsToFile(ExportExcelDialog.FileName);
+      SetStatusMessage(Format(rsExcelExportCompletedFmt,
+        [ExportExcelDialog.FileName]));
+    except
+      on E: Exception do
+        MessageDlg(Format(rsExcelExportErrorFmt, [sLineBreak, E.Message]),
+          mtError, [mbOK], 0);
+    end;
+  finally
+    EndLongOperation;
   end;
 end;
 
@@ -1070,8 +1353,8 @@ begin
         raise EArgumentException.Create(rsFolderRequired);
       DistanceLimit := ComparisonQualityToDistance(FComparisonQuality);
       ThreadCount := LoadApplicationThreadCount;
-      FWorker := TImageScan.Create(Roots.ToArray, FRecursiveSearch, DistanceLimit, DefaultMaxRGBError,
-        ThreadCount, FIncludeSingletons);
+      FWorker := TImageScan.Create(Roots.ToArray, FRecursiveSearch,
+        DistanceLimit, DefaultMaxRGBError, ThreadCount);
     except
       on E: Exception do
       begin
@@ -1163,6 +1446,8 @@ begin
     FocusNode := nil;
     for G := 0 to FGroups.Count - 1 do
     begin
+      if not GroupIsVisible(FGroups[G]) then
+        Continue;
       GroupNode := ResultsTree.AddChild(nil);
       Data := ResultsTree.GetNodeData(GroupNode);
       Data.Kind := nkGroup;
@@ -1209,6 +1494,7 @@ var
   Group: TImageGroup;
   I, Found: Integer;
   Phase, FocusFile: string;
+  TreeChanged, OldVisible, NewVisible: Boolean;
 begin
   if not Assigned(FWorker) then
     Exit;
@@ -1227,6 +1513,7 @@ begin
   begin
     FocusFile := FocusedFileName;
     CaptureChecks;
+    TreeChanged := FShowSingletonGroups;
     for Group in Update.Groups do
     begin
       Found := -1;
@@ -1237,15 +1524,26 @@ begin
           Break
         end;
       if Found < 0 then
-        FGroups.Add(Group)
+      begin
+        FGroups.Add(Group);
+        TreeChanged := TreeChanged or (Length(Group.Members) > 1);
+      end
       else
+      begin
+        OldVisible := Length(FGroups[Found].Members) > 1;
+        NewVisible := Length(Group.Members) > 1;
         FGroups[Found] := Group;
+        TreeChanged := TreeChanged or OldVisible or NewVisible;
+      end;
     end;
-    if FSortColumn = 0 then
-      SortGroupsBySize(FSortAscending)
-    else if FSortColumn > 0 then
-      SortMembers(FSortColumn, FSortAscending);
-    BuildTree(False, FocusFile);
+    if TreeChanged then
+    begin
+      if FSortColumn = 0 then
+        SortGroupsBySize(FSortAscending)
+      else if FSortColumn > 0 then
+        SortMembers(FSortColumn, FSortAscending);
+      BuildTree(False, FocusFile);
+    end;
   end;
   if Update.Done then
   begin
@@ -1275,12 +1573,13 @@ begin
       Phase := rsScanCompletedWithErrors
     else
       Phase := rsScanCompleted;
-    if FGroups.Count = 0 then
+    if VisibleGroupCount = 0 then
       ResultsLabel.Caption := Format(rsNoGroupsFoundFmt, [Phase])
     else
-      ResultsLabel.Caption := Format(rsGroupsFoundFmt, [Phase, FGroups.Count, Update.GroupedFiles]);
+      ResultsLabel.Caption := Format(rsGroupsFoundFmt, [Phase,
+        VisibleGroupCount, VisibleFileCount]);
     SetStatusMessage(Format(rsScanSummaryFmt, [Phase, Update.Scanned,
-      FGroups.Count, Update.GroupedFiles, Update.ErrorCount]));
+      VisibleGroupCount, VisibleFileCount, Update.ErrorCount]));
     if not FClosePending and Assigned(ResultsTree.FocusedNode) then
       ShowNode(ResultsTree.FocusedNode);
     if FClosePending then
@@ -1289,9 +1588,13 @@ begin
   else if ActionStopScan.Enabled then
   begin
     if Update.TotalImages > 0 then
-      SetStatusMessage(Format(rsScanProgressFmt, [FWorker.ThreadCount, Update.Scanned, Update.TotalImages, FGroups.Count, Update.ErrorCount, Update.CurrentFile]))
+      SetStatusMessage(Format(rsScanProgressFmt, [FWorker.ThreadCount,
+        Update.Scanned, Update.TotalImages, VisibleGroupCount,
+        Update.ErrorCount, Update.CurrentFile]))
     else
-      SetStatusMessage(Format(rsScanProgressCalculatingFmt, [FWorker.ThreadCount, Update.Scanned, FGroups.Count, Update.ErrorCount, Update.CurrentFile]));
+      SetStatusMessage(Format(rsScanProgressCalculatingFmt,
+        [FWorker.ThreadCount, Update.Scanned, VisibleGroupCount,
+        Update.ErrorCount, Update.CurrentFile]));
   end;
 end;
 
@@ -1309,7 +1612,8 @@ begin
   if Data.Kind = nkGroup then
   begin
     if Column = 0 then
-      CellText := Format(rsGroupCaptionFmt, [Data.GroupIndex + 1, Length(G.Members)]);
+      CellText := Format(rsGroupCaptionFmt,
+        [VisibleGroupOrdinal(Data.GroupIndex), Length(G.Members)]);
     Exit;
   end;
   if (Data.MemberIndex < 0) or (Data.MemberIndex >= Length(G.Members)) then
@@ -1445,25 +1749,30 @@ var
 begin
   if (HitInfo.Column < 0) or (HitInfo.Column >= ResultsTree.Header.Columns.Count) then
     Exit;
-  FocusFile := FocusedFileName;
-  CaptureChecks;
-  if FSortColumn = HitInfo.Column then
-    FSortAscending := not FSortAscending
-  else
-  begin
-    FSortColumn := HitInfo.Column;
-    FSortAscending := True;
+  BeginLongOperation;
+  try
+    FocusFile := FocusedFileName;
+    CaptureChecks;
+    if FSortColumn = HitInfo.Column then
+      FSortAscending := not FSortAscending
+    else
+    begin
+      FSortColumn := HitInfo.Column;
+      FSortAscending := True;
+    end;
+    ResultsTree.Header.SortColumn := FSortColumn;
+    if FSortAscending then
+      ResultsTree.Header.SortDirection := sdAscending
+    else
+      ResultsTree.Header.SortDirection := sdDescending;
+    if FSortColumn = 0 then
+      SortGroupsBySize(FSortAscending)
+    else
+      SortMembers(FSortColumn, FSortAscending);
+    BuildTree(False, FocusFile);
+  finally
+    EndLongOperation;
   end;
-  ResultsTree.Header.SortColumn := FSortColumn;
-  if FSortAscending then
-    ResultsTree.Header.SortDirection := sdAscending
-  else
-    ResultsTree.Header.SortDirection := sdDescending;
-  if FSortColumn = 0 then
-    SortGroupsBySize(FSortAscending)
-  else
-    SortMembers(FSortColumn, FSortAscending);
-  BuildTree(False, FocusFile);
 end;
 
 function TFormSession.ResolveSelectionContext(out GroupIndex,
@@ -1497,6 +1806,10 @@ end;
 
 procedure TFormSession.SelectionMenuPopup(Sender: TObject);
 begin
+  // A toolbar dropdown has no current file. Context popups set the flag
+  // before opening the same menu and keep the selected file available.
+  if not FSelectionMenuHasFileContext then
+    FSelectionContextFileName := '';
   RefreshActionStates;
 end;
 
@@ -1510,16 +1823,14 @@ begin
     FSelectionContextFileName :=
       FGroups[ContextGroup].Members[ContextMember].Info.FileName;
   RefreshActionStates;
-  SelectionMenu.Popup(ScreenPoint.X, ScreenPoint.Y);
-end;
-
-procedure TFormSession.ActionSelectionOptionsExecute(Sender: TObject);
-var
-  P: TPoint;
-begin
-  P := ToolButtonSelectionOptions.ClientToScreen(
-    Point(0, ToolButtonSelectionOptions.Height));
-  ShowSelectionMenuAt(P, -1, -1);
+  FSelectionMenuHasFileContext := True;
+  try
+    SelectionMenu.Popup(ScreenPoint.X, ScreenPoint.Y);
+  finally
+    // The selected command can be dispatched after Popup returns, so its
+    // action is responsible for clearing FSelectionContextFileName.
+    FSelectionMenuHasFileContext := False;
+  end;
 end;
 
 procedure TFormSession.ResultsTreeMouseWheel(Sender: TObject;
@@ -1609,7 +1920,7 @@ begin
   ShowSelectionMenuAt(P, Data.GroupIndex, Data.MemberIndex);
 end;
 
-procedure TFormSession.RemoveRecycledFiles(const FileNames: TArray<string>);
+procedure TFormSession.RemoveFilesFromSession(const FileNames: TArray<string>);
 var
   Removed: TDictionary<string, Boolean>;
   ClassCounts: TDictionary<Integer, Integer>;
@@ -1760,33 +2071,39 @@ begin
       Exit;
     if MessageDlg(Format(rsRecycleConfirmFmt, [Selected.Count]), mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
       Exit;
-    FDeleting := True;
-    RefreshActionStates;
-    ResultsTree.Enabled := False;
-    CloseFullSize(False);
-    Failures := 0;
+    BeginLongOperation;
     try
-      for FileName in Selected do
-      begin
-        SetStatusMessage(Format(rsMovingToRecycleBinFmt, [FileName]));
-        if RecycleFile(Handle, FileName, ErrorText) then
-          Recycled.Add(FileName)
-        else
-        begin
-          Inc(Failures);
-          FErrors.Add(FileName + ': ' + ErrorText);
-        end;
-      end;
-      RemoveRecycledFiles(Recycled.ToArray);
-      ResultsLabel.Caption := Format(rsResultsUpdatedFmt, [FGroups.Count, Integer(ResultsTree.TotalCount) - FGroups.Count]);
-      SetStatusMessage(Format(rsRecycleSummaryFmt, [Recycled.Count, Failures]));
-      if Failures > 0 then
-        MessageDlg(Format(rsRecycleFailuresFmt, [Failures, sLineBreak]),
-          mtWarning, [mbOK], 0);
-    finally
-      FDeleting := False;
-      ResultsTree.Enabled := True;
+      FDeleting := True;
       RefreshActionStates;
+      ResultsTree.Enabled := False;
+      CloseFullSize(False);
+      Failures := 0;
+      try
+        for FileName in Selected do
+        begin
+          SetStatusMessage(Format(rsMovingToRecycleBinFmt, [FileName]));
+          if RecycleFile(Handle, FileName, ErrorText) then
+            Recycled.Add(FileName)
+          else
+          begin
+            Inc(Failures);
+            FErrors.Add(FileName + ': ' + ErrorText);
+          end;
+        end;
+        RemoveFilesFromSession(Recycled.ToArray);
+        UpdateResultsCaption;
+        SetStatusMessage(Format(rsRecycleSummaryFmt,
+          [Recycled.Count, Failures]));
+        if Failures > 0 then
+          MessageDlg(Format(rsRecycleFailuresFmt, [Failures, sLineBreak]),
+            mtWarning, [mbOK], 0);
+      finally
+        FDeleting := False;
+        ResultsTree.Enabled := True;
+        RefreshActionStates;
+      end;
+    finally
+      EndLongOperation;
     end;
   finally
     Recycled.Free;
@@ -1815,39 +2132,43 @@ begin
     [mbYes, mbNo], 0) <> mrYes then
     Exit;
 
-  SearchRoot := CommonSearchRoot(PathsMemo.Lines);
-  MovedFiles := TDictionary<string, string>.Create;
-  FDeleting := True;
-  RefreshActionStates;
-  ResultsTree.Enabled := False;
-  CloseFullSize(False);
-  Failures := 0;
+  BeginLongOperation;
   try
-    for SourceFile in Selected do
-    begin
-      SetStatusMessage(Format(rsMovingToFolderFmt, [SourceFile]));
-      if MoveFilePreservingStructure(SourceFile, SearchRoot,
-        DestinationRoot, DestinationFile, ErrorText) then
-        MovedFiles.Add(SourceFile, DestinationFile)
-      else
-      begin
-        Inc(Failures);
-        FErrors.Add(SourceFile + ': ' + ErrorText);
-      end;
-    end;
-    UpdateMovedFiles(MovedFiles);
-    ResultsLabel.Caption := Format(rsResultsUpdatedFmt,
-      [FGroups.Count, Integer(ResultsTree.TotalCount) - FGroups.Count]);
-    SetStatusMessage(Format(rsMoveSummaryFmt,
-      [MovedFiles.Count, Failures]));
-    if Failures > 0 then
-      MessageDlg(Format(rsMoveFailuresFmt, [Failures, sLineBreak]),
-        mtWarning, [mbOK], 0);
-  finally
-    FDeleting := False;
-    ResultsTree.Enabled := True;
-    MovedFiles.Free;
+    SearchRoot := CommonSearchRoot(PathsMemo.Lines);
+    MovedFiles := TDictionary<string, string>.Create;
+    FDeleting := True;
     RefreshActionStates;
+    ResultsTree.Enabled := False;
+    CloseFullSize(False);
+    Failures := 0;
+    try
+      for SourceFile in Selected do
+      begin
+        SetStatusMessage(Format(rsMovingToFolderFmt, [SourceFile]));
+        if MoveFilePreservingStructure(SourceFile, SearchRoot,
+          DestinationRoot, DestinationFile, ErrorText) then
+          MovedFiles.Add(SourceFile, DestinationFile)
+        else
+        begin
+          Inc(Failures);
+          FErrors.Add(SourceFile + ': ' + ErrorText);
+        end;
+      end;
+      UpdateMovedFiles(MovedFiles);
+      UpdateResultsCaption;
+      SetStatusMessage(Format(rsMoveSummaryFmt,
+        [MovedFiles.Count, Failures]));
+      if Failures > 0 then
+        MessageDlg(Format(rsMoveFailuresFmt, [Failures, sLineBreak]),
+          mtWarning, [mbOK], 0);
+    finally
+      FDeleting := False;
+      ResultsTree.Enabled := True;
+      MovedFiles.Free;
+      RefreshActionStates;
+    end;
+  finally
+    EndLongOperation;
   end;
 end;
 
@@ -1870,6 +2191,7 @@ begin
   CloseFullSize(False);
   PathsMemo.Clear;
   SetSearchOptions(8, True);
+  SetShowSingletonGroups(False);
   FGroups.Clear;
   FMetricReferences.Clear;
   FScannedFileCount := 0;
@@ -1935,31 +2257,36 @@ var
 begin
   if Assigned(FWorker) or FDeleting or (FileName = '') then
     Exit;
-  CaptureChecks;
-  FocusFile := FileName;
-  for G := 0 to FGroups.Count - 1 do
-  begin
-    Group := FGroups[G];
-    TargetMember := -1;
-    for M := 0 to High(Group.Members) do
-      if SameText(Group.Members[M].Info.FileName, FileName) then
-      begin
-        TargetMember := M;
-        Break;
-      end;
-    if TargetMember < 0 then
-      Continue;
-    for M := 0 to High(Group.Members) do
-      Group.Members[M].IsReference := M = TargetMember;
-    FGroups[G] := Group;
-    FMetricReferences.Remove(Group.Id);
-    ClearPreviews;
-    BuildTree(False, FocusFile);
-    if Assigned(ResultsTree.FocusedNode) then
-      ShowNode(ResultsTree.FocusedNode);
-    SetModified(True);
-    SetStatusMessage(Format(rsReferenceFileUpdatedFmt, [FileName]));
-    Exit;
+  BeginLongOperation;
+  try
+    CaptureChecks;
+    FocusFile := FileName;
+    for G := 0 to FGroups.Count - 1 do
+    begin
+      Group := FGroups[G];
+      TargetMember := -1;
+      for M := 0 to High(Group.Members) do
+        if SameText(Group.Members[M].Info.FileName, FileName) then
+        begin
+          TargetMember := M;
+          Break;
+        end;
+      if TargetMember < 0 then
+        Continue;
+      for M := 0 to High(Group.Members) do
+        Group.Members[M].IsReference := M = TargetMember;
+      FGroups[G] := Group;
+      FMetricReferences.Remove(Group.Id);
+      ClearPreviews;
+      BuildTree(False, FocusFile);
+      if Assigned(ResultsTree.FocusedNode) then
+        ShowNode(ResultsTree.FocusedNode);
+      SetModified(True);
+      SetStatusMessage(Format(rsReferenceFileUpdatedFmt, [FileName]));
+      Exit;
+    end;
+  finally
+    EndLongOperation;
   end;
 end;
 
@@ -2026,7 +2353,6 @@ procedure TFormSession.ActionNewSessionFromFolderExecute(Sender: TObject);
 var
   GroupIndex, MemberIndex: Integer;
   Folder: string;
-  Session: TFormSession;
 begin
   try
     if FDeleting or not ResolveSelectionContext(GroupIndex, MemberIndex) then
@@ -2040,8 +2366,7 @@ begin
     end;
     if not (Application.MainForm is TFormMain) then
       Exit;
-    Session := TFormSession(TFormMain(Application.MainForm).NewSession);
-    Session.PathsMemo.Lines.Text := Folder;
+    TFormMain(Application.MainForm).NewSession(Folder);
   finally
     FSelectionContextFileName := '';
     RefreshActionStates;
@@ -2133,30 +2458,35 @@ var
   end;
 
 begin
-  CaptureChecks;
-  FocusFile := FocusedFileName;
-  for G := 0 to FGroups.Count - 1 do
-  begin
-    Group := FGroups[G];
-    if Length(Group.Members) = 0 then
-      Continue;
-    Best := 0;
-    for M := 1 to High(Group.Members) do
-      if IsBetter(Group.Members[M], Group.Members[Best]) then
-        Best := M;
-    for M := 0 to High(Group.Members) do
-      Group.Members[M].IsReference := M = Best;
-    // Recomputing every image in every group here made this action
-    // proportional to the entire library and blocked the UI. Metrics
-    // are refreshed once, on demand, when a group is previewed.
-    FGroups[G] := Group;
+  BeginLongOperation;
+  try
+    CaptureChecks;
+    FocusFile := FocusedFileName;
+    for G := 0 to FGroups.Count - 1 do
+    begin
+      Group := FGroups[G];
+      if Length(Group.Members) = 0 then
+        Continue;
+      Best := 0;
+      for M := 1 to High(Group.Members) do
+        if IsBetter(Group.Members[M], Group.Members[Best]) then
+          Best := M;
+      for M := 0 to High(Group.Members) do
+        Group.Members[M].IsReference := M = Best;
+      // Recomputing every image in every group here made this action
+      // proportional to the entire library and blocked the UI. Metrics
+      // are refreshed once, on demand, when a group is previewed.
+      FGroups[G] := Group;
+    end;
+    ClearPreviews;
+    BuildTree(False, FocusFile);
+    if Assigned(ResultsTree.FocusedNode) then
+      ShowNode(ResultsTree.FocusedNode);
+    SetModified(True);
+    SetStatusMessage(rsReferencesUpdated);
+  finally
+    EndLongOperation;
   end;
-  ClearPreviews;
-  BuildTree(False, FocusFile);
-  if Assigned(ResultsTree.FocusedNode) then
-    ShowNode(ResultsTree.FocusedNode);
-  SetModified(True);
-  SetStatusMessage(rsReferencesUpdated);
 end;
 
 procedure TFormSession.ApplyGroupSelection(
@@ -2166,36 +2496,41 @@ var
   SelectMember: Boolean;
   FocusFile: string;
 begin
-  CaptureChecks;
-  FocusFile := FocusedFileName;
-  FChecked.Clear;
-  for G := 0 to FGroups.Count - 1 do
-  begin
-    ReferenceIndex := ReferenceMemberIndex(FGroups[G]);
-    if ReferenceIndex < 0 then
-      Continue;
-    ReferenceClass := FGroups[G].Members[ReferenceIndex].ExactClass;
-    for M := 0 to High(FGroups[G].Members) do
+  BeginLongOperation;
+  try
+    CaptureChecks;
+    FocusFile := FocusedFileName;
+    FChecked.Clear;
+    for G := 0 to FGroups.Count - 1 do
     begin
-      SelectMember := False;
-      case Criterion of
-        gscAllExceptReference:
-          SelectMember := M <> ReferenceIndex;
-        gscIdenticalToReference:
-          SelectMember := (M <> ReferenceIndex) and
-            (FGroups[G].Members[M].ExactClass = ReferenceClass);
-        gscDifferentFromReference:
-          SelectMember := (M <> ReferenceIndex) and
-            (FGroups[G].Members[M].ExactClass <> ReferenceClass);
+      ReferenceIndex := ReferenceMemberIndex(FGroups[G]);
+      if ReferenceIndex < 0 then
+        Continue;
+      ReferenceClass := FGroups[G].Members[ReferenceIndex].ExactClass;
+      for M := 0 to High(FGroups[G].Members) do
+      begin
+        SelectMember := False;
+        case Criterion of
+          gscAllExceptReference:
+            SelectMember := M <> ReferenceIndex;
+          gscIdenticalToReference:
+            SelectMember := (M <> ReferenceIndex) and
+              (FGroups[G].Members[M].ExactClass = ReferenceClass);
+          gscDifferentFromReference:
+            SelectMember := (M <> ReferenceIndex) and
+              (FGroups[G].Members[M].ExactClass <> ReferenceClass);
+        end;
+        if SelectMember then
+          FChecked.AddOrSetValue(
+            FGroups[G].Members[M].Info.FileName, True);
       end;
-      if SelectMember then
-        FChecked.AddOrSetValue(
-          FGroups[G].Members[M].Info.FileName, True);
     end;
+    BuildTree(False, FocusFile);
+    SetModified(True);
+    SetStatusMessage(rsAutoSelectionApplied);
+  finally
+    EndLongOperation;
   end;
-  BuildTree(False, FocusFile);
-  SetModified(True);
-  SetStatusMessage(rsAutoSelectionApplied);
 end;
 
 procedure TFormSession.ApplyFolderSelection(SameFolder: Boolean);
@@ -2205,27 +2540,32 @@ var
 begin
   if not ResolveSelectionContext(ContextGroup, M) then
     Exit;
-  ContextFolder := ExcludeTrailingPathDelimiter(ExpandFileName(
-    ExtractFilePath(FGroups[ContextGroup].Members[M].Info.FileName)));
-  FocusFile := FocusedFileName;
-  CaptureChecks;
-  FChecked.Clear;
-  for G := 0 to FGroups.Count - 1 do
-  begin
-    if G = ContextGroup then
-      Continue;
-    for M := 0 to High(FGroups[G].Members) do
+  BeginLongOperation;
+  try
+    ContextFolder := ExcludeTrailingPathDelimiter(ExpandFileName(
+      ExtractFilePath(FGroups[ContextGroup].Members[M].Info.FileName)));
+    FocusFile := FocusedFileName;
+    CaptureChecks;
+    FChecked.Clear;
+    for G := 0 to FGroups.Count - 1 do
     begin
-      CandidateFolder := ExcludeTrailingPathDelimiter(ExpandFileName(
-        ExtractFilePath(FGroups[G].Members[M].Info.FileName)));
-      if SameText(CandidateFolder, ContextFolder) = SameFolder then
-        FChecked.AddOrSetValue(
-          FGroups[G].Members[M].Info.FileName, True);
+      if (G = ContextGroup) or not GroupIsVisible(FGroups[G]) then
+        Continue;
+      for M := 0 to High(FGroups[G].Members) do
+      begin
+        CandidateFolder := ExcludeTrailingPathDelimiter(ExpandFileName(
+          ExtractFilePath(FGroups[G].Members[M].Info.FileName)));
+        if SameText(CandidateFolder, ContextFolder) = SameFolder then
+          FChecked.AddOrSetValue(
+            FGroups[G].Members[M].Info.FileName, True);
+      end;
     end;
+    BuildTree(False, FocusFile);
+    SetModified(True);
+    SetStatusMessage(rsFolderSelectionApplied);
+  finally
+    EndLongOperation;
   end;
-  BuildTree(False, FocusFile);
-  SetModified(True);
-  SetStatusMessage(rsFolderSelectionApplied);
 end;
 
 procedure TFormSession.ActionReferenceHighestQualityExecute(Sender: TObject);
@@ -2307,41 +2647,51 @@ var
   G, M: Integer;
   AllSelected, IsSelected: Boolean;
 begin
-  CaptureChecks;
-  for G := 0 to FGroups.Count - 1 do
-  begin
-    AllSelected := Length(FGroups[G].Members) > 0;
-    for M := 0 to High(FGroups[G].Members) do
+  BeginLongOperation;
+  try
+    CaptureChecks;
+    for G := 0 to FGroups.Count - 1 do
     begin
-      IsSelected := False;
-      FChecked.TryGetValue(FGroups[G].Members[M].Info.FileName, IsSelected);
-      if not IsSelected then
+      AllSelected := Length(FGroups[G].Members) > 0;
+      for M := 0 to High(FGroups[G].Members) do
       begin
-        AllSelected := False;
-        Break
+        IsSelected := False;
+        FChecked.TryGetValue(FGroups[G].Members[M].Info.FileName, IsSelected);
+        if not IsSelected then
+        begin
+          AllSelected := False;
+          Break
+        end;
+      end;
+      if AllSelected then
+      begin
+        for M := 0 to High(FGroups[G].Members) do
+          if FGroups[G].Members[M].IsReference then
+          begin
+            FChecked.AddOrSetValue(FGroups[G].Members[M].Info.FileName, False);
+            Break;
+          end;
       end;
     end;
-    if AllSelected then
-    begin
-      for M := 0 to High(FGroups[G].Members) do
-        if FGroups[G].Members[M].IsReference then
-        begin
-          FChecked.AddOrSetValue(FGroups[G].Members[M].Info.FileName, False);
-          Break;
-        end;
-    end;
+    BuildTree(False);
+    SetModified(True);
+    SetStatusMessage(rsGroupKeepsUnselectedFile);
+  finally
+    EndLongOperation;
   end;
-  BuildTree(False);
-  SetModified(True);
-  SetStatusMessage(rsGroupKeepsUnselectedFile);
 end;
 
 procedure TFormSession.ActionClearSelectionsExecute(Sender: TObject);
 begin
-  FChecked.Clear;
-  BuildTree(False);
-  SetModified(True);
-  SetStatusMessage(rsAllSelectionsCleared);
+  BeginLongOperation;
+  try
+    FChecked.Clear;
+    BuildTree(False);
+    SetModified(True);
+    SetStatusMessage(rsAllSelectionsCleared);
+  finally
+    EndLongOperation;
+  end;
 end;
 
 procedure TFormSession.ResultsTreeChange(Sender: TBaseVirtualTree; Node: PVirtualNode);
@@ -2407,20 +2757,26 @@ begin
   G := FGroups[GroupIndex];
   if Length(G.Members) < 1 then
     Exit;
-  if Data.Kind = nkGroup then
-    MemberIndex := 0
-  else
-    MemberIndex := Data.MemberIndex;
-  if (FSelectedGroup <> GroupIndex) or (FPreviewMemberCount <> Length(G.Members)) then
-  begin
+  BeginLongOperation;
+  try
+    if Data.Kind = nkGroup then
+      MemberIndex := 0
+    else
+      MemberIndex := Data.MemberIndex;
+    if (FSelectedGroup <> GroupIndex) or
+      (FPreviewMemberCount <> Length(G.Members)) then
+    begin
+      FSelectedGroup := GroupIndex;
+      BuildPreviews(GroupIndex)
+    end
+    else if (MemberIndex >= 0) and (MemberIndex < FPreviewCards.Count) then
+      LoadPreview(FPreviewCards[MemberIndex], G.Members[MemberIndex]);
     FSelectedGroup := GroupIndex;
-    BuildPreviews(GroupIndex)
-  end
-  else if (MemberIndex >= 0) and (MemberIndex < FPreviewCards.Count) then
-    LoadPreview(FPreviewCards[MemberIndex], G.Members[MemberIndex]);
-  FSelectedGroup := GroupIndex;
-  FSelectedMember := MemberIndex;
-  UpdatePreviewSelection;
+    FSelectedMember := MemberIndex;
+    UpdatePreviewSelection;
+  finally
+    EndLongOperation;
+  end;
 end;
 
 procedure TFormSession.ClearPreviews;
@@ -2840,7 +3196,7 @@ begin
   State.ScannedFiles := FScannedFileCount;
   State.Roots := PathsMemo.Lines.ToStringArray;
   State.Recursive := FRecursiveSearch;
-  State.IncludeSingletons := FIncludeSingletons;
+  State.ShowSingletonGroups := FShowSingletonGroups;
   State.Groups := FGroups.ToArray;
   CaptureChecks;
   Selected := TList<string>.Create;
@@ -2876,7 +3232,8 @@ begin
   finally
     PathsMemo.Lines.EndUpdate;
   end;
-  SetSearchOptions(State.Quality, State.Recursive, State.IncludeSingletons);
+  SetSearchOptions(State.Quality, State.Recursive);
+  SetShowSingletonGroups(State.ShowSingletonGroups);
   FScannedFileCount := State.ScannedFiles;
   FGroups.Clear;
   FMetricReferences.Clear;
@@ -2895,7 +3252,8 @@ begin
   if Assigned(ResultsTree.FocusedNode) then
     ShowNode(ResultsTree.FocusedNode);
   RefreshActionStates;
-  ResultsLabel.Caption := Format(rsSessionLoadedResultsFmt, [FGroups.Count, Integer(ResultsTree.TotalCount) - FGroups.Count]);
+  ResultsLabel.Caption := Format(rsSessionLoadedResultsFmt,
+    [VisibleGroupCount, VisibleFileCount]);
   StatusProgress.Style := pbstNormal;
   SetProgressVisible(False);
   if FScannedFileCount > 0 then
@@ -2910,7 +3268,8 @@ begin
     StatusProgress.Position := 0;
     StatusProgress.Hint := rsSessionCountUnavailable;
   end;
-  SetStatusMessage(Format(rsSessionStatusFmt, [FScannedFileCount, FGroups.Count, Integer(ResultsTree.TotalCount) - FGroups.Count]));
+  SetStatusMessage(Format(rsSessionStatusFmt, [FScannedFileCount,
+    VisibleGroupCount, VisibleFileCount]));
   RefreshActionStates;
 end;
 
@@ -3027,29 +3386,52 @@ begin
   SetModified(False);
 end;
 
+procedure TFormSession.InitializeSearchFolder(const Folder: string);
+begin
+  PathsMemo.Lines.BeginUpdate;
+  try
+    PathsMemo.Clear;
+    PathsMemo.Lines.Add(ExpandFileName(Folder));
+  finally
+    PathsMemo.Lines.EndUpdate;
+  end;
+  SetModified(True);
+  RefreshActionStates;
+end;
+
 procedure TFormSession.LoadDocument(const FileName: string);
 begin
-  LoadSessionFromFile(FileName);
-  FSessionFileName := ExpandFileName(FileName);
-  Caption := ExtractFileName(FSessionFileName);
-  SetModified(False);
-  SetStatusMessage(Format(rsSessionLoadedFileFmt,
-    [FSessionFileName, FScannedFileCount]));
-  if Application.MainForm is TFormMain then
-    TFormMain(Application.MainForm).RegisterRecentSessionFile(
-      FSessionFileName);
+  BeginLongOperation;
+  try
+    LoadSessionFromFile(FileName);
+    FSessionFileName := ExpandFileName(FileName);
+    Caption := ExtractFileName(FSessionFileName);
+    SetModified(False);
+    SetStatusMessage(Format(rsSessionLoadedFileFmt,
+      [FSessionFileName, FScannedFileCount]));
+    if Application.MainForm is TFormMain then
+      TFormMain(Application.MainForm).RegisterRecentSessionFile(
+        FSessionFileName);
+  finally
+    EndLongOperation;
+  end;
 end;
 
 procedure TFormSession.SaveDocument(const FileName: string);
 begin
-  SaveSessionToFile(FileName);
-  FSessionFileName := ExpandFileName(FileName);
-  Caption := ExtractFileName(FSessionFileName);
-  SetModified(False);
-  SetStatusMessage(Format(rsSessionSavedFmt, [FSessionFileName]));
-  if Application.MainForm is TFormMain then
-    TFormMain(Application.MainForm).RegisterRecentSessionFile(
-      FSessionFileName);
+  BeginLongOperation;
+  try
+    SaveSessionToFile(FileName);
+    FSessionFileName := ExpandFileName(FileName);
+    Caption := ExtractFileName(FSessionFileName);
+    SetModified(False);
+    SetStatusMessage(Format(rsSessionSavedFmt, [FSessionFileName]));
+    if Application.MainForm is TFormMain then
+      TFormMain(Application.MainForm).RegisterRecentSessionFile(
+        FSessionFileName);
+  finally
+    EndLongOperation;
+  end;
 end;
 
 function TFormSession.CanSaveDocument: Boolean;

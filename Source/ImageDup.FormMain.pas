@@ -46,6 +46,38 @@ type
     RecentSession5MenuItem: TMenuItem;
     FileSeparatorMenuItem: TMenuItem;
     ExitMenuItem: TMenuItem;
+    SessionMenu: TMenuItem;
+    SessionSaveMenuItem: TMenuItem;
+    SessionSeparator1: TMenuItem;
+    SessionRevalidateMenuItem: TMenuItem;
+    SessionStartMenuItem: TMenuItem;
+    SessionStopMenuItem: TMenuItem;
+    SessionSeparator2: TMenuItem;
+    SessionReferenceMenuItem: TMenuItem;
+    SessionReferenceHighestQualityMenuItem: TMenuItem;
+    SessionReferenceHighestResolutionMenuItem: TMenuItem;
+    SessionReferenceLargestFileMenuItem: TMenuItem;
+    SessionReferenceNewestMenuItem: TMenuItem;
+    SessionReferenceLowestQualityMenuItem: TMenuItem;
+    SessionReferenceLowestResolutionMenuItem: TMenuItem;
+    SessionReferenceSmallestFileMenuItem: TMenuItem;
+    SessionReferenceOldestMenuItem: TMenuItem;
+    SessionSelectionsMenuItem: TMenuItem;
+    SessionSelectAllExceptReferenceMenuItem: TMenuItem;
+    SessionSelectIdenticalMenuItem: TMenuItem;
+    SessionSelectDifferentMenuItem: TMenuItem;
+    SessionSelectionSeparator: TMenuItem;
+    SessionEnsureUnselectedMenuItem: TMenuItem;
+    SessionClearSelectionsMenuItem: TMenuItem;
+    SessionSeparator3: TMenuItem;
+    SessionRecycleMenuItem: TMenuItem;
+    SessionMoveMenuItem: TMenuItem;
+    SessionSeparator4: TMenuItem;
+    SessionErrorsMenuItem: TMenuItem;
+    SessionOptionsMenuItem: TMenuItem;
+    SessionExportMenuItem: TMenuItem;
+    SessionSeparator5: TMenuItem;
+    SessionShowSingletonsMenuItem: TMenuItem;
     WindowMenu: TMenuItem;
     CascadeMenuItem: TMenuItem;
     TileHorizontalMenuItem: TMenuItem;
@@ -74,12 +106,15 @@ type
     FNextSessionNumber: Integer;
     FRecentSessionFiles: TStringList;
     FStartupProcessed: Boolean;
+    FPreviousApplicationOnHint: TNotifyEvent;
+    procedure ApplicationHint(Sender: TObject);
     function ActiveSession: TForm;
     function RecentSessionMenuItem(Index: Integer): TMenuItem;
     procedure RefreshRecentSessionsMenu;
     procedure RemoveRecentSessionFile(const FileName: string);
     procedure RecentSessionClick(Sender: TObject);
     procedure SaveActiveSession(ForceFileName: Boolean);
+    procedure RefreshSessionMenu;
     procedure OpenCommandLineSessions;
     function ApplyApplicationStyle(const StyleName,
       DisplayName: string): Boolean;
@@ -90,7 +125,7 @@ type
     procedure WndProc(var Message: TMessage); override;
   public
     function CloseQuery: Boolean; override;
-    function NewSession: TForm;
+    function NewSession(const InitialFolder: string = ''): TForm;
     function OpenSessionFile(const FileName: string): TForm;
     procedure RegisterRecentSessionFile(const FileName: string);
   end;
@@ -104,7 +139,7 @@ implementation
 
 uses
   ImageDup.FormSession, ImageDup.FormAbout, ImageDup.FormSettings,
-  ImageDup.Settings;
+  ImageDup.Language, ImageDup.Settings;
 
 resourcestring
   rsUntitledSessionFmt = 'Session %d';
@@ -162,13 +197,15 @@ begin
     Result := nil;
 end;
 
-function TFormMain.NewSession: TForm;
+function TFormMain.NewSession(const InitialFolder: string): TForm;
 var
   Session: TFormSession;
 begin
   Inc(FNextSessionNumber);
   Session := TFormSession.Create(Application);
   Session.InitializeUntitled(Format(rsUntitledSessionFmt, [FNextSessionNumber]));
+  if InitialFolder <> '' then
+    Session.InitializeSearchFolder(InitialFolder);
   Session.Show;
   if MDIChildCount = 1 then
     Session.WindowState := wsMaximized;
@@ -251,6 +288,8 @@ end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
+  FPreviousApplicationOnHint := Application.OnHint;
+  Application.OnHint := ApplicationHint;
   FRecentSessionFiles := TStringList.Create;
   FRecentSessionFiles.CaseSensitive := False;
   LoadRecentSessionFiles(FRecentSessionFiles);
@@ -265,7 +304,20 @@ end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
 begin
+  Application.OnHint := FPreviousApplicationOnHint;
   FreeAndNil(FRecentSessionFiles);
+end;
+
+procedure TFormMain.ApplicationHint(Sender: TObject);
+var
+  Session: TForm;
+begin
+  if Assigned(FPreviousApplicationOnHint) then
+    FPreviousApplicationOnHint(Sender);
+
+  Session := ActiveSession;
+  if Session is TFormSession then
+    TFormSession(Session).ShowApplicationHint(GetLongHint(Application.Hint));
 end;
 
 procedure TFormMain.RefreshRecentSessionsMenu;
@@ -405,6 +457,101 @@ begin
   OpenCommandLineSessions;
 end;
 
+procedure TFormMain.RefreshSessionMenu;
+var
+  Session: TFormSession;
+
+  procedure Link(Item: TMenuItem; SessionAction: TBasicAction);
+  begin
+    if Item.Action <> SessionAction then
+      Item.Action := SessionAction;
+    if not Assigned(SessionAction) then
+      Item.Enabled := False;
+  end;
+
+begin
+  Session := nil;
+  if ActiveSession is TFormSession then
+    Session := TFormSession(ActiveSession);
+  SessionMenu.Enabled := Assigned(Session);
+
+  if Assigned(Session) then
+  begin
+    Link(SessionRevalidateMenuItem, Session.ActionRevalidateFiles);
+    Link(SessionStartMenuItem, Session.ActionStartScan);
+    Link(SessionStopMenuItem, Session.ActionStopScan);
+    Link(SessionReferenceHighestQualityMenuItem,
+      Session.ActionReferenceHighestQuality);
+    Link(SessionReferenceHighestResolutionMenuItem,
+      Session.ActionReferenceHighestResolution);
+    Link(SessionReferenceLargestFileMenuItem,
+      Session.ActionReferenceLargestFile);
+    Link(SessionReferenceNewestMenuItem, Session.ActionReferenceNewest);
+    Link(SessionReferenceLowestQualityMenuItem,
+      Session.ActionReferenceLowestQuality);
+    Link(SessionReferenceLowestResolutionMenuItem,
+      Session.ActionReferenceLowestResolution);
+    Link(SessionReferenceSmallestFileMenuItem,
+      Session.ActionReferenceSmallestFile);
+    Link(SessionReferenceOldestMenuItem, Session.ActionReferenceOldest);
+    Link(SessionSelectAllExceptReferenceMenuItem,
+      Session.ActionSelectAllExceptReference);
+    Link(SessionSelectIdenticalMenuItem,
+      Session.ActionSelectIdenticalToReference);
+    Link(SessionSelectDifferentMenuItem,
+      Session.ActionSelectDifferentFromReference);
+    Link(SessionEnsureUnselectedMenuItem, Session.ActionEnsureUnselected);
+    Link(SessionClearSelectionsMenuItem, Session.ActionClearSelections);
+    Link(SessionRecycleMenuItem, Session.ActionDeleteSelected);
+    Link(SessionMoveMenuItem, Session.ActionMoveSelected);
+    Link(SessionErrorsMenuItem, Session.ActionShowErrors);
+    Link(SessionOptionsMenuItem, Session.ActionOptions);
+    Link(SessionExportMenuItem, Session.ActionExportExcel);
+    Link(SessionShowSingletonsMenuItem,
+      Session.ActionShowSingletonGroups);
+    SessionReferenceMenuItem.Enabled :=
+      Session.ActionReferenceHighestQuality.Enabled;
+    SessionSelectionsMenuItem.Enabled :=
+      Session.ActionSelectAllExceptReference.Enabled;
+    SessionStartMenuItem.Visible := not Assigned(Session.Worker);
+    SessionStopMenuItem.Visible := Assigned(Session.Worker);
+    SessionErrorsMenuItem.Visible := Session.ActionShowErrors.Visible;
+    SessionShowSingletonsMenuItem.Checked :=
+      Session.ActionShowSingletonGroups.Checked;
+  end
+  else
+  begin
+    Link(SessionRevalidateMenuItem, nil);
+    Link(SessionStartMenuItem, nil);
+    Link(SessionStopMenuItem, nil);
+    Link(SessionReferenceHighestQualityMenuItem, nil);
+    Link(SessionReferenceHighestResolutionMenuItem, nil);
+    Link(SessionReferenceLargestFileMenuItem, nil);
+    Link(SessionReferenceNewestMenuItem, nil);
+    Link(SessionReferenceLowestQualityMenuItem, nil);
+    Link(SessionReferenceLowestResolutionMenuItem, nil);
+    Link(SessionReferenceSmallestFileMenuItem, nil);
+    Link(SessionReferenceOldestMenuItem, nil);
+    Link(SessionSelectAllExceptReferenceMenuItem, nil);
+    Link(SessionSelectIdenticalMenuItem, nil);
+    Link(SessionSelectDifferentMenuItem, nil);
+    Link(SessionEnsureUnselectedMenuItem, nil);
+    Link(SessionClearSelectionsMenuItem, nil);
+    Link(SessionRecycleMenuItem, nil);
+    Link(SessionMoveMenuItem, nil);
+    Link(SessionErrorsMenuItem, nil);
+    Link(SessionOptionsMenuItem, nil);
+    Link(SessionExportMenuItem, nil);
+    Link(SessionShowSingletonsMenuItem, nil);
+    SessionReferenceMenuItem.Enabled := False;
+    SessionSelectionsMenuItem.Enabled := False;
+    SessionStartMenuItem.Visible := True;
+    SessionStopMenuItem.Visible := False;
+    SessionErrorsMenuItem.Visible := False;
+    SessionShowSingletonsMenuItem.Checked := False;
+  end;
+end;
+
 procedure TFormMain.ActionListUpdate(Action: TBasicAction; var Handled: Boolean);
 var
   Session: TFormSession;
@@ -421,6 +568,7 @@ begin
   ActionTileHorizontal.Enabled := MDIChildCount > 0;
   ActionTileVertical.Enabled := MDIChildCount > 0;
   ActionArrangeIcons.Enabled := MDIChildCount > 0;
+  RefreshSessionMenu;
   Handled := True;
 end;
 
@@ -517,22 +665,30 @@ begin
   ArrangeIcons;
 end;
 
+resourcestring
+  rsLanguageChangeRequiresRestart =
+    'The language setting has been saved. Restart ImageDup to use the ' +
+    'selected language.';
+
 procedure TFormMain.ActionSettingsExecute(Sender: TObject);
 var
-  ActiveStyle, SelectedStyle: string;
+  ActiveLanguage, ActiveStyle, SelectedLanguage, SelectedStyle: string;
   ThreadCount, SelectedThreadCount: Integer;
 begin
   ActiveStyle := TStyleManager.ActiveStyle.Name;
+  ActiveLanguage := LoadApplicationLanguage;
   ThreadCount := LoadApplicationThreadCount;
-  if not TFormSettings.Execute(Self, ActiveStyle, ThreadCount, SelectedStyle,
-    SelectedThreadCount) then
+  if not TFormSettings.Execute(Self, ActiveStyle, ActiveLanguage, ThreadCount,
+    SelectedStyle, SelectedLanguage, SelectedThreadCount) then
     Exit;
   if not ApplyApplicationStyle(SelectedStyle,
     ApplicationStyleDisplayName(SelectedStyle)) then
     Exit;
   try
     SaveApplicationSettings(TStyleManager.ActiveStyle.Name,
-      SelectedThreadCount);
+      SelectedLanguage, SelectedThreadCount);
+    if not SameText(ActiveLanguage, SelectedLanguage) then
+      MessageDlg(rsLanguageChangeRequiresRestart, mtInformation, [mbOK], 0);
   except
     on E: Exception do
       MessageDlg(Format(rsApplicationSettingsSaveErrorFmt,

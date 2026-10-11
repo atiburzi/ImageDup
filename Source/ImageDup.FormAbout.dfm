@@ -14,6 +14,7 @@ object FormAbout: TFormAbout
   Font.Style = []
   Position = poOwnerFormCenter
   Scaled = False
+  ShowHint = True
   OnCreate = FormCreate
   TextHeight = 17
   object AppImage: TImage
@@ -7260,6 +7261,7 @@ object FormAbout: TFormAbout
     Cancel = True
     Caption = 'OK'
     Default = True
+    Hint = 'Close the About ImageDup dialog.'
     ModalResult = 1
     TabOrder = 0
   end

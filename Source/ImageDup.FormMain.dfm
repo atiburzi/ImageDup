@@ -4719,6 +4719,7 @@ object FormMain: TFormMain
     FFF10000C0010000800100008003000080030000800300008003000080030000
     8003000080030000F8030000F8030000FFFF0000FFFF0000}
   Position = poScreenCenter
+  ShowHint = True
   StyleElements = [seFont, seClient]
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -4766,7 +4767,9 @@ object FormMain: TFormMain
     object ActionNewSession: TAction
       Category = 'File'
       Caption = 'New session'
-      Hint = 'Create a new session'
+      Hint =
+        'Create a blank session where you can choose folders and run an i' +
+        'ndependent duplicate-image search.'
       ImageIndex = 16
       ImageName = 'new'
       ShortCut = 16462
@@ -4775,7 +4778,9 @@ object FormMain: TFormMain
     object ActionLoadSession: TAction
       Category = 'File'
       Caption = 'Load session'
-      Hint = 'Open one or more ImageDup sessions'
+      Hint =
+        'Open one or more .idup session files, including their folders, m' +
+        'atching options, groups, references, and selections.'
       ImageIndex = 14
       ImageName = 'load'
       ShortCut = 16463
@@ -4785,6 +4790,9 @@ object FormMain: TFormMain
       Category = 'File'
       Caption = 'Save session'
       Enabled = False
+      Hint =
+        'Save changes to the active .idup session, including its folders,' +
+        ' options, results, references, and checked files.'
       ImageIndex = 27
       ImageName = 'save'
       ShortCut = 16467
@@ -4794,6 +4802,9 @@ object FormMain: TFormMain
       Category = 'File'
       Caption = 'Save session as...'
       Enabled = False
+      Hint =
+        'Save the active session to a new .idup file without replacing it' +
+        's current session file.'
       ImageIndex = 28
       ImageName = 'save-as'
       OnExecute = ActionSaveSessionAsExecute
@@ -4802,6 +4813,9 @@ object FormMain: TFormMain
       Category = 'File'
       Caption = 'Close session'
       Enabled = False
+      Hint =
+        'Close the active session. You will be asked whether to save if i' +
+        't contains unsaved changes.'
       ImageIndex = 4
       ImageName = 'close-session'
       ShortCut = 16471
@@ -4810,6 +4824,9 @@ object FormMain: TFormMain
     object ActionExit: TAction
       Category = 'File'
       Caption = 'Exit'
+      Hint =
+        'Close ImageDup and all open sessions, prompting to save any modi' +
+        'fied sessions.'
       ImageIndex = 8
       ImageName = 'exit'
       OnExecute = ActionExitExecute
@@ -4818,6 +4835,7 @@ object FormMain: TFormMain
       Category = 'Window'
       Caption = 'Cascade'
       Enabled = False
+      Hint = 'Arrange open session windows in an overlapping cascade.'
       ImageIndex = 37
       ImageName = 'window-cascade'
       OnExecute = ActionCascadeExecute
@@ -4826,6 +4844,7 @@ object FormMain: TFormMain
       Category = 'Window'
       Caption = 'Tile horizontally'
       Enabled = False
+      Hint = 'Arrange open session windows in horizontal rows.'
       ImageIndex = 38
       ImageName = 'window-tile-horizontal'
       OnExecute = ActionTileHorizontalExecute
@@ -4834,6 +4853,7 @@ object FormMain: TFormMain
       Category = 'Window'
       Caption = 'Tile vertically'
       Enabled = False
+      Hint = 'Arrange open session windows in vertical columns.'
       ImageIndex = 39
       ImageName = 'window-tile-vertical'
       OnExecute = ActionTileVerticalExecute
@@ -4842,13 +4862,18 @@ object FormMain: TFormMain
       Category = 'Window'
       Caption = 'Arrange icons'
       Enabled = False
+      Hint =
+        'Arrange the icons of minimized session windows along the main wo' +
+        'rkspace.'
       ImageName = 'window-arrange-icons'
       OnExecute = ActionArrangeIconsExecute
     end
     object ActionSettings: TAction
       Category = 'Tools'
       Caption = 'Settings'
-      Hint = 'Configure application-wide settings'
+      Hint =
+        'Configure application-wide appearance, language, and image-proce' +
+        'ssing thread settings.'
       ImageIndex = 40
       ImageName = 'settings'
       OnExecute = ActionSettingsExecute
@@ -4856,6 +4881,9 @@ object FormMain: TFormMain
     object ActionAbout: TAction
       Category = 'Help'
       Caption = 'About...'
+      Hint =
+        'Show ImageDup version, project, license, and application informa' +
+        'tion.'
       ImageIndex = 0
       ImageName = 'about'
       OnExecute = ActionAboutExecute
@@ -4893,6 +4921,7 @@ object FormMain: TFormMain
     Top = 392
     object FileMenu: TMenuItem
       Caption = '&File'
+      Hint = 'Create, open, save, close, and reopen ImageDup session files.'
       object NewSessionMenuItem: TMenuItem
         Action = ActionNewSession
       end
@@ -4943,8 +4972,136 @@ object FormMain: TFormMain
         Action = ActionExit
       end
     end
+    object SessionMenu: TMenuItem
+      Caption = '&Session'
+      Hint = 'Run and manage operations for the active session.'
+      object SessionSaveMenuItem: TMenuItem
+        Action = ActionSaveSession
+      end
+      object SessionSeparator1: TMenuItem
+        Caption = '-'
+      end
+      object SessionRevalidateMenuItem: TMenuItem
+        Caption = 'Revalidate files'
+        Enabled = False
+      end
+      object SessionStartMenuItem: TMenuItem
+        Caption = 'Start search'
+        Enabled = False
+      end
+      object SessionStopMenuItem: TMenuItem
+        Caption = 'Stop'
+        Enabled = False
+      end
+      object SessionSeparator2: TMenuItem
+        Caption = '-'
+      end
+      object SessionReferenceMenuItem: TMenuItem
+        Caption = 'Set reference'
+        Enabled = False
+        Hint =
+          'Choose how ImageDup selects the reference image independently in' +
+          ' every group.'
+        object SessionReferenceHighestQualityMenuItem: TMenuItem
+          Caption = 'Highest quality'
+          Enabled = False
+        end
+        object SessionReferenceHighestResolutionMenuItem: TMenuItem
+          Caption = 'Highest resolution'
+          Enabled = False
+        end
+        object SessionReferenceLargestFileMenuItem: TMenuItem
+          Caption = 'Largest file size'
+          Enabled = False
+        end
+        object SessionReferenceNewestMenuItem: TMenuItem
+          Caption = 'Newest file'
+          Enabled = False
+        end
+        object SessionReferenceLowestQualityMenuItem: TMenuItem
+          Caption = 'Lowest quality'
+          Enabled = False
+        end
+        object SessionReferenceLowestResolutionMenuItem: TMenuItem
+          Caption = 'Lowest resolution'
+          Enabled = False
+        end
+        object SessionReferenceSmallestFileMenuItem: TMenuItem
+          Caption = 'Smallest file size'
+          Enabled = False
+        end
+        object SessionReferenceOldestMenuItem: TMenuItem
+          Caption = 'Oldest file'
+          Enabled = False
+        end
+      end
+      object SessionSelectionsMenuItem: TMenuItem
+        Caption = 'Selections'
+        Enabled = False
+        Hint =
+          'Apply a batch rule that checks or clears files across the groups' +
+          ' in the active session.'
+        object SessionSelectAllExceptReferenceMenuItem: TMenuItem
+          Caption = 'Select all files except the reference'
+          Enabled = False
+        end
+        object SessionSelectIdenticalMenuItem: TMenuItem
+          Caption = 'Select files identical to the reference'
+          Enabled = False
+        end
+        object SessionSelectDifferentMenuItem: TMenuItem
+          Caption = 'Select files different from the reference'
+          Enabled = False
+        end
+        object SessionSelectionSeparator: TMenuItem
+          Caption = '-'
+        end
+        object SessionEnsureUnselectedMenuItem: TMenuItem
+          Caption = 'Keep at least one file unselected in each group'
+          Enabled = False
+        end
+        object SessionClearSelectionsMenuItem: TMenuItem
+          Caption = 'Clear all selections'
+          Enabled = False
+        end
+      end
+      object SessionSeparator3: TMenuItem
+        Caption = '-'
+      end
+      object SessionRecycleMenuItem: TMenuItem
+        Caption = 'Move to Recycle Bin...'
+        Enabled = False
+      end
+      object SessionMoveMenuItem: TMenuItem
+        Caption = 'Move to a folder...'
+        Enabled = False
+      end
+      object SessionSeparator4: TMenuItem
+        Caption = '-'
+      end
+      object SessionErrorsMenuItem: TMenuItem
+        Caption = 'Error details...'
+        Enabled = False
+      end
+      object SessionOptionsMenuItem: TMenuItem
+        Caption = 'Options'
+        Enabled = False
+      end
+      object SessionExportMenuItem: TMenuItem
+        Caption = 'Export to Excel...'
+        Enabled = False
+      end
+      object SessionSeparator5: TMenuItem
+        Caption = '-'
+      end
+      object SessionShowSingletonsMenuItem: TMenuItem
+        Caption = 'Show single-file groups'
+        Enabled = False
+      end
+    end
     object WindowMenu: TMenuItem
       Caption = '&Window'
+      Hint = 'Arrange the open session windows in the ImageDup workspace.'
       object CascadeMenuItem: TMenuItem
         Action = ActionCascade
         ImageIndex = 38
@@ -4963,12 +5120,14 @@ object FormMain: TFormMain
     end
     object ToolsMenu: TMenuItem
       Caption = '&Tools'
+      Hint = 'Configure settings shared by every ImageDup session.'
       object SettingsMenuItem: TMenuItem
         Action = ActionSettings
       end
     end
     object HelpMenu: TMenuItem
       Caption = '&Help'
+      Hint = 'Open information about ImageDup.'
       object AboutMenuItem: TMenuItem
         Action = ActionAbout
       end

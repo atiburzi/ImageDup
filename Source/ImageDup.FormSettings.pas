@@ -12,6 +12,10 @@ type
     ThemeLabel: TLabel;
     ThemeComboBox: TComboBox;
     ThemeDescriptionLabel: TLabel;
+    LanguageGroupBox: TGroupBox;
+    LanguageLabel: TLabel;
+    LanguageComboBox: TComboBox;
+    LanguageDescriptionLabel: TLabel;
     ScanningGroupBox: TGroupBox;
     ThreadLabel: TLabel;
     ThreadSpin: TSpinEdit;
@@ -21,7 +25,8 @@ type
     CancelButton: TButton;
   public
     class function Execute(AOwner: TComponent; const AActiveStyle: string;
-      AThreadCount: Integer; out ASelectedStyle: string;
+      const AActiveLanguage: string; AThreadCount: Integer;
+      out ASelectedStyle, ASelectedLanguage: string;
       out ASelectedThreadCount: Integer): Boolean; static;
   end;
 
@@ -32,7 +37,7 @@ implementation
 {$R *.dfm}
 
 uses
-  System.Math, Vcl.Themes, ImageDup.Settings;
+  System.Math, Vcl.Themes, ImageDup.Language, ImageDup.Settings;
 
 resourcestring
   rsStyleLight = 'Light Theme';
@@ -41,6 +46,10 @@ resourcestring
   rsStyleGreen = 'Green Theme';
   rsStylePurple = 'Purple Theme';
   rsStyleSlateGray = 'Slate Gray Theme';
+  rsLanguageAutomatic = 'Automatic (Windows)';
+  rsLanguageRestartDescription =
+    'Choose the application language. The new language will be used the ' +
+    'next time ImageDup starts.';
   rsThreadCountDescription =
     'This computer supports up to %d concurrent processing threads. Lower ' +
     'values leave more processor capacity available to other applications.';
@@ -64,9 +73,11 @@ begin
 end;
 
 class function TFormSettings.Execute(AOwner: TComponent;
-  const AActiveStyle: string; AThreadCount: Integer;
-  out ASelectedStyle: string; out ASelectedThreadCount: Integer): Boolean;
+  const AActiveStyle, AActiveLanguage: string; AThreadCount: Integer;
+  out ASelectedStyle, ASelectedLanguage: string;
+  out ASelectedThreadCount: Integer): Boolean;
 var
+  AvailableLanguages: TArray<TApplicationLanguageInfo>;
   Form: TFormSettings;
   I: Integer;
   MaxThreadCount: Integer;
@@ -94,6 +105,21 @@ begin
     if (Form.ThemeComboBox.ItemIndex < 0) and
       (Form.ThemeComboBox.Items.Count > 0) then
       Form.ThemeComboBox.ItemIndex := 0;
+
+    AvailableLanguages := AvailableApplicationLanguages;
+    Form.LanguageComboBox.Items.Add(rsLanguageAutomatic);
+    for I := 0 to High(AvailableLanguages) do
+      Form.LanguageComboBox.Items.Add(AvailableLanguages[I].DisplayName);
+    Form.LanguageComboBox.ItemIndex := 0;
+    if AActiveLanguage <> AutomaticApplicationLanguage then
+      for I := 0 to High(AvailableLanguages) do
+        if SameText(AvailableLanguages[I].Code, AActiveLanguage) then
+        begin
+          Form.LanguageComboBox.ItemIndex := I + 1;
+          Break;
+        end;
+    Form.LanguageDescriptionLabel.Caption := rsLanguageRestartDescription;
+
     MaxThreadCount := ApplicationMaxThreadCount;
     Form.ThreadSpin.MaxValue := MaxThreadCount;
     Form.ThreadDescriptionLabel.Caption := Format(rsThreadCountDescription,
@@ -106,6 +132,11 @@ begin
       (Form.ThemeComboBox.ItemIndex < Length(StyleNames)) then
     begin
       ASelectedStyle := StyleNames[Form.ThemeComboBox.ItemIndex];
+      if Form.LanguageComboBox.ItemIndex = 0 then
+        ASelectedLanguage := AutomaticApplicationLanguage
+      else
+        ASelectedLanguage :=
+          AvailableLanguages[Form.LanguageComboBox.ItemIndex - 1].Code;
       ASelectedThreadCount := Form.ThreadSpin.Value;
     end
     else

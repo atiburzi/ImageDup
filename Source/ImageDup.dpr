@@ -1,6 +1,8 @@
 program ImageDup;
 
 uses
+  ImageDup.LanguageBootstrap in 'ImageDup.LanguageBootstrap.pas',
+  ImageDup.Language in 'ImageDup.Language.pas',
   Vcl.Forms,
   ImageDup.FormMain in 'ImageDup.FormMain.pas' {FormMain},
   ImageDup.FormSession in 'ImageDup.FormSession.pas' {FormSession},

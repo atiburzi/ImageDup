@@ -8,7 +8,7 @@ type
   TSessionState = record
     Roots: TArray<string>;
     Recursive: Boolean;
-    IncludeSingletons: Boolean;
+    ShowSingletonGroups: Boolean;
     Quality: Integer;
     PixelError: Double;
     ScannedFiles: Integer;
@@ -130,7 +130,11 @@ begin
     Criteria.AddPair('paths', Paths);
     for S in State.Roots do Paths.Add(S);
     Criteria.AddPair('recursive', TJSONBool.Create(State.Recursive));
-    Criteria.AddPair('includeSingletons', TJSONBool.Create(State.IncludeSingletons));
+    // Kept for compatibility with older ImageDup releases. New scans always
+    // retain singleton groups; their visibility is controlled separately.
+    Criteria.AddPair('includeSingletons', TJSONBool.Create(True));
+    Criteria.AddPair('showSingletonGroups',
+      TJSONBool.Create(State.ShowSingletonGroups));
     Criteria.AddPair('quality', TJSONNumber.Create(State.Quality));
     Criteria.AddPair('pixelError', TJSONNumber.Create(State.PixelError));
     Selected := TJSONArray.Create;
@@ -209,7 +213,9 @@ begin
     SetLength(Result.Roots, Paths.Count);
     for I := 0 to Paths.Count - 1 do Result.Roots[I] := Paths.Items[I].Value;
     Result.Recursive := BoolValue(Criteria, 'recursive');
-    Result.IncludeSingletons := OptionalBoolValue(Criteria, 'includeSingletons', False);
+    Result.ShowSingletonGroups := OptionalBoolValue(Criteria,
+      'showSingletonGroups', OptionalBoolValue(Criteria,
+      'includeSingletons', False));
     if Criteria.GetValue('quality') <> nil then
       Result.Quality := IntValue(Criteria, 'quality')
     else

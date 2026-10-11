@@ -37,7 +37,7 @@ type
     // Only join a group when every member has a verified match. Groups are
     // disjoint, first-fit and order-dependent; similarity is not transitive.
     function Add(const Info: TImageInfo;
-      Matches: TDictionary<Integer, TComparison>; IncludeSingletons: Boolean = False): Integer;
+      Matches: TDictionary<Integer, TComparison>): Integer;
     function Snapshot(Id: Integer): TImageGroup;
   end;
 
@@ -190,7 +190,7 @@ begin
 end;
 
 function TGroupBuilder.Add(const Info: TImageInfo;
-  Matches: TDictionary<Integer, TComparison>; IncludeSingletons: Boolean): Integer;
+  Matches: TDictionary<Integer, TComparison>): Integer;
 var
   I, J: Integer;
   Fits: Boolean;
@@ -236,10 +236,7 @@ begin
   Member.Metrics.Structural := 1;
   Member.Metrics.WorstStructural := 1;
   Group.Add(Member);
-  if IncludeSingletons then
-    Result := FGroups.Count - 1
-  else
-    Result := -1; // Retain internally for future matches.
+  Result := FGroups.Count - 1;
 end;
 
 function TGroupBuilder.Snapshot(Id: Integer): TImageGroup;
