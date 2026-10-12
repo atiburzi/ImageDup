@@ -985,7 +985,6 @@ begin
   ActionShowErrors.Visible := HasErrors;
   ActionShowErrors.Enabled := (not Busy) and HasErrors;
   ToolButtonErrorDetails.Visible := HasErrors;
-//  ToolButtonSep6.Visible := HasErrors;
   ToolButtonSelectionOptions.Enabled := (not Busy) and HasGroups;
   ToolButtonSelectAction.Enabled := (not Busy) and HasSelection;
   ActionDeleteSelected.Enabled := (not Busy) and HasSelection;
