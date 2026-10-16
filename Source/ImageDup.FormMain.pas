@@ -4,8 +4,8 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Forms, Vcl.Controls, Vcl.Dialogs, Vcl.ComCtrls, Vcl.ActnList,
-  System.Actions, System.UITypes, Vcl.Menus, Vcl.FormTabsBar,
-  Vcl.Themes, Vcl.TitleBarCtrls, Vcl.ToolWin;
+  System.UITypes, Vcl.Menus, Vcl.FormTabsBar,
+  Vcl.Themes, Vcl.TitleBarCtrls, System.Actions, Vcl.ToolWin;
 
 const
   WM_REFRESH_HEADER = WM_APP + $120;

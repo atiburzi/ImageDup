@@ -3,8 +3,8 @@ object FormSession: TFormSession
   Top = 0
   ActiveControl = ResultsTree
   Caption = 'ImageDup'
-  ClientHeight = 1137
-  ClientWidth = 1599
+  ClientHeight = 1129
+  ClientWidth = 1597
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -4453,8 +4453,8 @@ object FormSession: TFormSession
   TextHeight = 17
   object PreviewSplitter: TSplitter
     Left = 0
-    Top = 745
-    Width = 1599
+    Top = 737
+    Width = 1597
     Height = 6
     Cursor = crVSplit
     Hint = 'Drag to resize the results list and image preview areas.'
@@ -4468,13 +4468,13 @@ object FormSession: TFormSession
   object SetupPanel: TPanel
     Left = 0
     Top = 40
-    Width = 1599
+    Width = 1597
     Height = 89
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      1599
+      1597
       89)
     object PathsLabel: TLabel
       Left = 16
@@ -4488,7 +4488,7 @@ object FormSession: TFormSession
     object PathsMemo: TMemo
       Left = 16
       Top = 18
-      Width = 1408
+      Width = 1406
       Height = 66
       Hint = 
         'Enter or paste one folder per line. Every listed folder is scann' +
@@ -4500,7 +4500,7 @@ object FormSession: TFormSession
       OnChange = PathsMemoChange
     end
     object BrowseButton: TButton
-      Left = 1430
+      Left = 1428
       Top = 18
       Width = 153
       Height = 66
@@ -4517,19 +4517,18 @@ object FormSession: TFormSession
   object ResultsPanel: TPanel
     Left = 0
     Top = 129
-    Width = 1599
-    Height = 616
+    Width = 1597
+    Height = 608
     Align = alClient
     BevelOuter = bvNone
     Constraints.MinHeight = 150
     Padding.Left = 16
     Padding.Right = 16
     TabOrder = 1
-    ExplicitHeight = 621
     object ResultsLabel: TLabel
       Left = 16
       Top = 0
-      Width = 1567
+      Width = 1565
       Height = 30
       Hint = 
         'Summarizes the current results and the number of scanned or visi' +
@@ -4539,12 +4538,13 @@ object FormSession: TFormSession
       Caption = 'Similar image groups - add folders and start the search'
       Layout = tlCenter
       ExplicitTop = -8
+      ExplicitWidth = 1567
     end
     object ResultsTree: TVirtualStringTree
       Left = 16
       Top = 30
-      Width = 1567
-      Height = 586
+      Width = 1565
+      Height = 578
       Hint = 
         'Expand a group to inspect its files. Select a row to display the' +
         ' group previews, and use each checkbox to mark files for batch a' +
@@ -4575,7 +4575,6 @@ object FormSession: TFormSession
       OnNodeDblClick = ResultsTreeNodeDblClick
       Touch.InteractiveGestures = [igPan, igPressAndTap]
       Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
-      ExplicitHeight = 591
       Columns = <
         item
           Position = 0
@@ -4606,8 +4605,8 @@ object FormSession: TFormSession
   end
   object PreviewPanel: TPanel
     Left = 0
-    Top = 751
-    Width = 1599
+    Top = 743
+    Width = 1597
     Height = 362
     Align = alBottom
     BevelOuter = bvNone
@@ -4620,11 +4619,10 @@ object FormSession: TFormSession
     ParentFont = False
     TabOrder = 2
     OnResize = PreviewPanelResize
-    ExplicitTop = 756
     object PreviewScroll: TScrollBox
       Left = 0
       Top = 0
-      Width = 1599
+      Width = 1597
       Height = 362
       Hint = 
         'Displays every image in the selected group. Click a preview to o' +
@@ -4642,7 +4640,7 @@ object FormSession: TFormSession
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 1599
+    Width = 1597
     Height = 40
     Margins.Left = 4
     Margins.Top = 4
@@ -4871,8 +4869,8 @@ object FormSession: TFormSession
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 1113
-    Width = 1599
+    Top = 1105
+    Width = 1597
     Height = 24
     Hint = 
       'Shows the current operation, scan and result counts, checked fil' +
@@ -4886,7 +4884,6 @@ object FormSession: TFormSession
         Style = psOwnerDraw
         Width = 280
       end>
-    ExplicitTop = 1115
   end
   object StatusProgress: TProgressBar
     Left = 1416

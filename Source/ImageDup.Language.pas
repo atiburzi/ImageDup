@@ -18,7 +18,7 @@ function LoadApplicationLanguage: string;
 implementation
 
 uses
-  Winapi.Windows, System.SysUtils, System.Character, System.Win.Registry;
+  Winapi.Windows, System.SysUtils, System.Win.Registry;
 
 const
   SettingsRegistryKey = 'Software\ImageDup';

@@ -5,8 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, Winapi.CommCtrl, System.SysUtils, System.Classes, System.Types, System.Generics.Collections, System.UITypes, Vcl.Graphics, Vcl.Controls,
   Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Menus, VirtualTrees, VirtualTrees.Types, ImageDup.Scan, ImageDup.FormMain,
-  ImageDup.Groups, VirtualTrees.BaseTree, System.Actions, Vcl.ActnList,
-  Vcl.ImgList, Vcl.ToolWin, VirtualTrees.BaseAncestorVCL,
+  ImageDup.Groups, VirtualTrees.BaseTree, Vcl.ActnList,
+  Vcl.ImgList, System.Actions, Vcl.ToolWin, VirtualTrees.BaseAncestorVCL,
   VirtualTrees.AncestorVCL;
 
 type

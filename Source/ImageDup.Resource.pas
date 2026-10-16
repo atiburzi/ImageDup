@@ -3,7 +3,7 @@ unit ImageDup.Resource;
 interface
 
 uses
-  System.SysUtils, System.Classes, Vcl.ImageCollection,
+  System.Classes, Vcl.ImageCollection,
   Vcl.VirtualImageList, System.ImageList, Vcl.ImgList, Vcl.BaseImageCollection;
 
 type

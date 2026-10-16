@@ -22,7 +22,7 @@ type
 implementation
 
 uses
-  Winapi.Windows, System.SysUtils, Vcl.Graphics;
+  Winapi.Windows, System.SysUtils;
 
 {$R *.dfm}
 

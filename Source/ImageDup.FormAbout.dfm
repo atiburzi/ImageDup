@@ -7258,10 +7258,10 @@ object FormAbout: TFormAbout
     Top = 224
     Width = 80
     Height = 30
+    Hint = 'Close the About ImageDup dialog.'
     Cancel = True
     Caption = 'OK'
     Default = True
-    Hint = 'Close the About ImageDup dialog.'
     ModalResult = 1
     TabOrder = 0
   end

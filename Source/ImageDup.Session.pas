@@ -21,7 +21,7 @@ function LoadSession(const FileName: string): TSessionState;
 
 implementation
 
-uses System.Classes, System.DateUtils, System.IOUtils, System.JSON, System.Math,
+uses System.DateUtils, System.IOUtils, System.JSON, System.Math,
   ImageDup.Core;
 
 resourcestring

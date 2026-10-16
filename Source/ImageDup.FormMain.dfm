@@ -4767,7 +4767,7 @@ object FormMain: TFormMain
     object ActionNewSession: TAction
       Category = 'File'
       Caption = 'New session'
-      Hint =
+      Hint = 
         'Create a blank session where you can choose folders and run an i' +
         'ndependent duplicate-image search.'
       ImageIndex = 16
@@ -4778,7 +4778,7 @@ object FormMain: TFormMain
     object ActionLoadSession: TAction
       Category = 'File'
       Caption = 'Load session'
-      Hint =
+      Hint = 
         'Open one or more .idup session files, including their folders, m' +
         'atching options, groups, references, and selections.'
       ImageIndex = 14
@@ -4790,7 +4790,7 @@ object FormMain: TFormMain
       Category = 'File'
       Caption = 'Save session'
       Enabled = False
-      Hint =
+      Hint = 
         'Save changes to the active .idup session, including its folders,' +
         ' options, results, references, and checked files.'
       ImageIndex = 27
@@ -4802,7 +4802,7 @@ object FormMain: TFormMain
       Category = 'File'
       Caption = 'Save session as...'
       Enabled = False
-      Hint =
+      Hint = 
         'Save the active session to a new .idup file without replacing it' +
         's current session file.'
       ImageIndex = 28
@@ -4813,7 +4813,7 @@ object FormMain: TFormMain
       Category = 'File'
       Caption = 'Close session'
       Enabled = False
-      Hint =
+      Hint = 
         'Close the active session. You will be asked whether to save if i' +
         't contains unsaved changes.'
       ImageIndex = 4
@@ -4824,7 +4824,7 @@ object FormMain: TFormMain
     object ActionExit: TAction
       Category = 'File'
       Caption = 'Exit'
-      Hint =
+      Hint = 
         'Close ImageDup and all open sessions, prompting to save any modi' +
         'fied sessions.'
       ImageIndex = 8
@@ -4862,7 +4862,7 @@ object FormMain: TFormMain
       Category = 'Window'
       Caption = 'Arrange icons'
       Enabled = False
-      Hint =
+      Hint = 
         'Arrange the icons of minimized session windows along the main wo' +
         'rkspace.'
       ImageName = 'window-arrange-icons'
@@ -4871,7 +4871,7 @@ object FormMain: TFormMain
     object ActionSettings: TAction
       Category = 'Tools'
       Caption = 'Settings'
-      Hint =
+      Hint = 
         'Configure application-wide appearance, language, and image-proce' +
         'ssing thread settings.'
       ImageIndex = 40
@@ -4881,7 +4881,7 @@ object FormMain: TFormMain
     object ActionAbout: TAction
       Category = 'Help'
       Caption = 'About...'
-      Hint =
+      Hint = 
         'Show ImageDup version, project, license, and application informa' +
         'tion.'
       ImageIndex = 0
@@ -4999,7 +4999,7 @@ object FormMain: TFormMain
       object SessionReferenceMenuItem: TMenuItem
         Caption = 'Set reference'
         Enabled = False
-        Hint =
+        Hint = 
           'Choose how ImageDup selects the reference image independently in' +
           ' every group.'
         object SessionReferenceHighestQualityMenuItem: TMenuItem
@@ -5038,7 +5038,7 @@ object FormMain: TFormMain
       object SessionSelectionsMenuItem: TMenuItem
         Caption = 'Selections'
         Enabled = False
-        Hint =
+        Hint = 
           'Apply a batch rule that checks or clears files across the groups' +
           ' in the active session.'
         object SessionSelectAllExceptReferenceMenuItem: TMenuItem
